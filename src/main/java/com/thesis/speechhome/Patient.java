@@ -2,6 +2,9 @@ package com.thesis.speechhome;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+import java.time.Period;
+
 @Entity
 public class Patient {
 
@@ -13,12 +16,17 @@ public class Patient {
     private String username;
 
     private String password;
-    private String role;       // PATIENT or THERAPIST
+    private String role; // PATIENT or THERAPIST
     private String name;
 
     private String language;
-    private String ageGroup;
+
+    private LocalDate dateOfBirth;
+
     private String diagnosis;
+
+    @Column(length = 1000)
+    private String diagnosisOther;
 
     private Double targetLow;
     private Double targetHigh;
@@ -67,12 +75,12 @@ public class Patient {
         this.language = language;
     }
 
-    public String getAgeGroup() {
-        return ageGroup;
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
     }
 
-    public void setAgeGroup(String ageGroup) {
-        this.ageGroup = ageGroup;
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public String getDiagnosis() {
@@ -81,6 +89,14 @@ public class Patient {
 
     public void setDiagnosis(String diagnosis) {
         this.diagnosis = diagnosis;
+    }
+
+    public String getDiagnosisOther() {
+        return diagnosisOther;
+    }
+
+    public void setDiagnosisOther(String diagnosisOther) {
+        this.diagnosisOther = diagnosisOther;
     }
 
     public Double getTargetLow() {
@@ -97,5 +113,21 @@ public class Patient {
 
     public void setTargetHigh(Double targetHigh) {
         this.targetHigh = targetHigh;
+    }
+
+    @Transient
+    public Integer getAge() {
+        if (dateOfBirth == null) return null;
+        return Period.between(dateOfBirth, LocalDate.now()).getYears();
+    }
+
+    @Transient
+    public String getDiagnosisDisplay() {
+        if ("Other".equalsIgnoreCase(diagnosis) &&
+                diagnosisOther != null &&
+                !diagnosisOther.isBlank()) {
+            return diagnosisOther;
+        }
+        return diagnosis;
     }
 }

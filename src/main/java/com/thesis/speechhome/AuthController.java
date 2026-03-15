@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -20,7 +22,7 @@ public class AuthController {
             @RequestParam String password,
             @RequestParam String name,
             @RequestParam String language,
-            @RequestParam String ageGroup) {
+            @RequestParam(required = false) String dateOfBirth) {
 
         return patientRepo.findByUsername(username)
                 .orElseGet(() -> {
@@ -30,8 +32,13 @@ public class AuthController {
                     p.setName(name);
                     p.setRole("PATIENT");
                     p.setLanguage(language);
-                    p.setAgeGroup(ageGroup);
+
+                    if (dateOfBirth != null && !dateOfBirth.isBlank()) {
+                        p.setDateOfBirth(LocalDate.parse(dateOfBirth));
+                    }
+
                     p.setDiagnosis("Dysarthria");
+                    p.setDiagnosisOther(null);
                     p.setTargetLow(2.8);
                     p.setTargetHigh(3.8);
                     return patientRepo.save(p);
@@ -52,8 +59,9 @@ public class AuthController {
                     t.setName(name);
                     t.setRole("THERAPIST");
                     t.setLanguage("");
-                    t.setAgeGroup("");
                     t.setDiagnosis("");
+                    t.setDiagnosisOther(null);
+                    t.setDateOfBirth(null);
                     return patientRepo.save(t);
                 });
     }
