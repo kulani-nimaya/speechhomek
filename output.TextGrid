@@ -21,49 +21,40 @@ item []:
         name = """nuclei""" 
         xmin = 0 
         xmax = 4.352 
-        points: size = 15 
+        points: size = 12 
         points [1]:
-            number = 0.304 
+            number = 0.224 
             mark = """n""" 
         points [2]:
-            number = 0.544 
+            number = 0.368 
             mark = """n""" 
         points [3]:
-            number = 0.64 
+            number = 0.848 
             mark = """n""" 
         points [4]:
-            number = 0.784 
+            number = 1.024 
             mark = """n""" 
         points [5]:
-            number = 1.696 
+            number = 1.536 
             mark = """n""" 
         points [6]:
-            number = 2.096 
+            number = 1.696 
             mark = """n""" 
         points [7]:
-            number = 2.576 
+            number = 1.872 
             mark = """n""" 
         points [8]:
-            number = 2.7520000000000002 
+            number = 2.032 
             mark = """n""" 
         points [9]:
-            number = 2.8000000000000003 
+            number = 2.208 
             mark = """n""" 
         points [10]:
-            number = 2.848 
+            number = 2.608 
             mark = """n""" 
         points [11]:
-            number = 3.2800000000000002 
+            number = 3.024 
             mark = """n""" 
         points [12]:
-            number = 3.3280000000000003 
-            mark = """n""" 
-        points [13]:
             number = 3.648 
-            mark = """n""" 
-        points [14]:
-            number = 3.968 
-            mark = """n""" 
-        points [15]:
-            number = 4.16 
             mark = """n""" 
