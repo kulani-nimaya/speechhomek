@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Patient Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root{
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --primary: #2563eb;
+            --primary-2: #7c3aed;
+            --good-bg: #dcfce7;
+            --good-fg: #166534;
+            --fast-bg: #fee2e2;
+            --fast-fg: #b91c1c;
+            --slow-bg: #fef3c7;
+            --slow-fg: #92400e;
+            --msg-bg: #ecfeff;
+            --msg-border: #38bdf8;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(180deg, #eef4ff 0%, var(--bg) 100%);
+            color: var(--text);
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            color: white;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .logout-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.18);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .wrap {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 18px;
+            display: grid;
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 18px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+            border: 1px solid rgba(219, 227, 238, 0.8);
+        }
+
+        .card h2 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+
+        .mini-info {
+            font-size: 14px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        .message-box {
+            background: var(--msg-bg);
+            border: 1px solid var(--msg-border);
+            border-radius: 16px;
+            padding: 12px;
+        }
+
+        .message-box h3 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+        }
+
+        .messages-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        .messages-table th,
+        .messages-table td {
+            text-align: left;
+            padding: 8px 6px;
+            border-bottom: 1px solid #dbeafe;
+            font-size: 13px;
+            vertical-align: top;
+        }
+
+        .empty-msg {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .record-btn {
+            width: 180px;
+            height: 180px;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 16px 40px rgba(59, 130, 246, 0.25);
+            margin: 10px auto 0;
+            display: block;
+        }
+
+        .status {
+            margin-top: 12px;
+            font-size: 14px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 40px;
+            font-weight: 800;
+            margin: 8px 0;
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .badge.good { background: var(--good-bg); color: var(--good-fg); }
+        .badge.fast { background: var(--fast-bg); color: var(--fast-fg); }
+        .badge.slow { background: var(--slow-bg); color: var(--slow-fg); }
+
+        .result-details {
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        @media (max-width: 640px) {
+            header { padding: 16px; }
+            .title { font-size: 19px; }
+            .record-btn {
+                width: 150px;
+                height: 150px;
+                font-size: 18px;
+            }
+            .result-value { font-size: 34px; }
+            .messages-table th,
+            .messages-table td { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div>
+        <div class="title" id="patientTitle">Hi</div>
+        <div class="subtitle">Home speech practice</div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</header>
+
+<div class="wrap">
+    <div class="card">
+        <h2>Your profile</h2>
+        <div class="mini-info">Language: <span id="patientLanguage">-</span></div>
+        <div class="mini-info">Age group: <span id="patientAgeGroup">-</span></div>
+        <div class="mini-info">Diagnosis: <span id="patientDiagnosis">-</span></div>
+    </div>
+
+    <div class="card">
+        <h2>Messages from your therapist</h2>
+        <div class="message-box">
+            <div id="messagesEmpty" class="empty-msg">No messages yet. Your therapist can send guidance here.</div>
+            <table id="messagesTable" class="messages-table" style="display:none;">
+                <thead>
+                <tr>
+                    <th style="width: 35%;">Date</th>
+                    <th>Message</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card center">
+        <h2>Practice now</h2>
+        <p style="margin:0;color:#6b7280;font-size:14px;">
+            Press the button, speak for a few seconds, then stop recording.<br>
+            For better results, keep the microphone about <strong>15–20 cm</strong> from your mouth and speak in a quiet room.
+        </p>
+        <button id="recordBtn" class="record-btn" onclick="toggleRecording()">Start<br>Recording</button>
+        <div id="status" class="status"></div>
+    </div>
+
+    <div class="card">
+        <h2>Result</h2>
+        <div id="resultArea" style="display:none;">
+            <div id="rateValue" class="result-value"></div>
+            <div class="center" id="rateBadge"></div>
+            <div id="rateDetails" class="result-details"></div>
+        </div>
+        <div id="resultPlaceholder" class="result-details">
+            Your speech rate result will appear here after recording.
+        </div>
+    </div>
+</div>
+
+<script>
+    let patientId = localStorage.getItem('patientId');
+
+    if (!patientId) {
+        window.location.href = '/';
+    }
+
+    let audioContext;
+    let mediaStream;
+    let processor;
+    let recordedData = [];
+    let isRecording = false;
+
+    async function loadPatientInfo() {
+        try {
+            const res = await fetch('/api/patients/' + patientId);
+            if (!res.ok) return;
+            const p = await res.json();
+            document.getElementById('patientTitle').textContent = "Hi, " + (p.name || "");
+            document.getElementById('patientLanguage').textContent = p.language || "-";
+            document.getElementById('patientAgeGroup').textContent = p.ageGroup || "-";
+            document.getElementById('patientDiagnosis').textContent = p.diagnosis || "-";
+        } catch (e) {
+            console.error("Error loading patient info", e);
+        }
+    }
+
+    async function loadMessages() {
+        try {
+            const res = await fetch('/api/patients/' + patientId + '/notes');
+            if (!res.ok) return;
+
+            const notes = await res.json();
+            const emptyEl = document.getElementById('messagesEmpty');
+            const table = document.getElementById('messagesTable');
+            const tbody = table.querySelector('tbody');
+            tbody.innerHTML = '';
+
+            if (notes.length === 0) {
+                emptyEl.style.display = 'block';
+                table.style.display = 'none';
+                return;
+            }
+
+            emptyEl.style.display = 'none';
+            table.style.display = 'table';
+
+            notes.forEach(n => {
+                const tr = document.createElement('tr');
+                const d = new Date(n.createdAt);
+                const dateStr = d.toLocaleString();
+                tr.innerHTML =
+                    '<td>' + dateStr + '</td>' +
+                    '<td>' + (n.content || '') + '</td>';
+                tbody.appendChild(tr);
+            });
+        } catch (e) {
+            console.error("Error loading messages", e);
+        }
+    }
+
+    async function toggleRecording() {
+        if (!isRecording) await startRecording();
+        else stopRecording();
+    }
+
+    async function startRecording() {
+        recordedData = [];
+        document.getElementById('status').textContent = "Requesting microphone...";
+
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        } catch (e) {
+            alert("Microphone access denied.");
+            document.getElementById('status').textContent = "";
+            return;
+        }
+
+        audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+        const source = audioContext.createMediaStreamSource(mediaStream);
+        processor = audioContext.createScriptProcessor(4096, 1, 1);
+
+        processor.onaudioprocess = function(e) {
+            if (!isRecording) return;
+            const channelData = e.inputBuffer.getChannelData(0);
+            recordedData.push(new Float32Array(channelData));
+        };
+
+        source.connect(processor);
+        processor.connect(audioContext.destination);
+
+        isRecording = true;
+        document.getElementById('recordBtn').innerHTML = "Stop<br>Recording";
+        document.getElementById('status').textContent = "Recording... speak now.";
+    }
+
+    function stopRecording() {
+        isRecording = false;
+        document.getElementById('recordBtn').innerHTML = "Start<br>Recording";
+        document.getElementById('status').textContent = "Processing recording...";
+
+        if (processor) processor.disconnect();
+        if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+        if (audioContext) audioContext.close();
+
+        const wavBlob = encodeWAV(recordedData, 16000);
+        sendForAnalysis(wavBlob);
+    }
+
+    function encodeWAV(buffers, sampleRate) {
+        let length = 0;
+        buffers.forEach(b => length += b.length);
+        const data = new Float32Array(length);
+        let offset = 0;
+        buffers.forEach(b => { data.set(b, offset); offset += b.length; });
+
+        const bytesPerSample = 2;
+        const blockAlign = bytesPerSample * 1;
+        const buffer = new ArrayBuffer(44 + data.length * bytesPerSample);
+        const view = new DataView(buffer);
+
+        function writeString(view, offset, str) {
+            for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+        }
+
+        let pos = 0;
+        writeString(view, pos, 'RIFF'); pos += 4;
+        view.setUint32(pos, 36 + data.length * bytesPerSample, true); pos += 4;
+        writeString(view, pos, 'WAVE'); pos += 4;
+        writeString(view, pos, 'fmt '); pos += 4;
+        view.setUint32(pos, 16, true); pos += 4;
+        view.setUint16(pos, 1, true); pos += 2;
+        view.setUint16(pos, 1, true); pos += 2;
+        view.setUint32(pos, sampleRate, true); pos += 4;
+        view.setUint32(pos, sampleRate * blockAlign, true); pos += 4;
+        view.setUint16(pos, blockAlign, true); pos += 2;
+        view.setUint16(pos, bytesPerSample * 8, true); pos += 2;
+        writeString(view, pos, 'data'); pos += 4;
+        view.setUint32(pos, data.length * bytesPerSample, true); pos += 4;
+
+        let index = 0;
+        const volume = 32767;
+        for (let i = 0; i < data.length; i++) {
+            view.setInt16(pos + index, data[i] * volume, true);
+            index += 2;
+        }
+        return new Blob([view], { type: 'audio/wav' });
+    }
+
+    async function sendForAnalysis(wavBlob) {
+        document.getElementById('status').textContent = "Uploading and analyzing...";
+
+        const formData = new FormData();
+        formData.append('audio', wavBlob, 'recording.wav');
+
+        const res = await fetch('/api/patients/' + patientId + '/analyze', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!res.ok) {
+            document.getElementById('status').textContent = "Error: " + res.status;
+            return;
+        }
+
+        const result = await res.json();
+        document.getElementById('status').textContent = "Analysis complete.";
+        showResult(result);
+    }
+
+    function showResult(result) {
+        document.getElementById('resultArea').style.display = 'block';
+        document.getElementById('resultPlaceholder').style.display = 'none';
+        document.getElementById('rateValue').textContent =
+            result.syllablesPerSec.toFixed(2) + " syll/sec";
+
+        const badgeDiv = document.getElementById('rateBadge');
+        badgeDiv.innerHTML = '';
+        const span = document.createElement('span');
+        span.classList.add('badge');
+
+        const fb = (result.feedback || '').toLowerCase();
+        if (fb === 'good pace') {
+            span.classList.add('good');
+            span.textContent = result.feedback;
+        } else if (fb.includes('slow')) {
+            span.classList.add('slow');
+            span.textContent = result.feedback;
+        } else if (fb.includes('fast')) {
+            span.classList.add('fast');
+            span.textContent = result.feedback;
+        } else {
+            span.textContent = result.feedback;
+        }
+        badgeDiv.appendChild(span);
+
+        document.getElementById('rateDetails').textContent =
+            "Syllables: " + result.syllables +
+            " | Duration: " + result.recordingDurationSec.toFixed(2) + " s" +
+            " | Speaking span: " + result.speakingSpanSec.toFixed(2) + " s" +
+            " | Target: " + result.targetLow.toFixed(1) + "–" + result.targetHigh.toFixed(1) +
+            " | Voice level: " + result.loudnessFeedback;
+    }
+
+    function logout() {
+        localStorage.removeItem('patientId');
+        localStorage.removeItem('patientName');
+        window.location.href = '/';
+    }
+
+    loadPatientInfo();
+    loadMessages();
+</script>
+</body>
+</html>

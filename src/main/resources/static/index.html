@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Speech Home Practice</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg,#EEF2FF,#E0F2FE);
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            min-height:100vh;
+            margin:0;
+            padding:16px;
+        }
+        .card {
+            background:white;
+            padding:32px;
+            border-radius:24px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.08);
+            width:440px;
+            max-width:100%;
+        }
+        h1 {
+            margin-top:0;
+            color:#1F2933;
+            text-align:center;
+        }
+        .role-row {
+            display:flex;
+            gap:8px;
+            margin-bottom:16px;
+        }
+        .role-btn {
+            flex:1;
+            text-align:center;
+            padding:10px;
+            border-radius:999px;
+            border:1px solid #CBD5E1;
+            cursor:pointer;
+            font-weight:bold;
+            background:white;
+            color:#1F2933;
+        }
+        .role-btn.active {
+            background:#3B82F6;
+            color:white;
+            border-color:#3B82F6;
+        }
+        label {
+            font-size:13px;
+            color:#4B5563;
+        }
+        input, select {
+            width:100%;
+            padding:8px;
+            border-radius:8px;
+            border:1px solid #CBD5E1;
+            margin:4px 0 10px 0;
+        }
+        button.main {
+            margin-top:8px;
+            padding:10px 16px;
+            border-radius:999px;
+            border:none;
+            background:#3B82F6;
+            color:white;
+            font-weight:bold;
+            cursor:pointer;
+            width:100%;
+        }
+        button.secondary {
+            margin-top:8px;
+            padding:8px 14px;
+            border-radius:999px;
+            border:1px solid #3B82F6;
+            background:white;
+            color:#3B82F6;
+            font-weight:bold;
+            cursor:pointer;
+            width:100%;
+            font-size:13px;
+        }
+        #signupBox {
+            margin-top:12px;
+            padding-top:8px;
+            border-top:1px dashed #E5E7EB;
+            display:none;
+        }
+        #msg { margin-top:6px; font-size:13px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>Speech Home Practice</h1>
+
+    <div class="role-row">
+        <div id="rolePatient" class="role-btn active" onclick="setRole('PATIENT')">Patient</div>
+        <div id="roleTherapist" class="role-btn" onclick="setRole('THERAPIST')">Therapist</div>
+    </div>
+
+    <div id="loginBox">
+        <label>Username</label>
+        <input id="liUser" placeholder="your username">
+
+        <label>Password</label>
+        <input id="liPass" type="password" placeholder="your password">
+
+        <button class="main" onclick="login()">Log in</button>
+        <button class="secondary" onclick="openSignup()">Create new account</button>
+    </div>
+
+    <div id="signupBox">
+        <label>Full name</label>
+        <input id="suName" placeholder="e.g. Nimaya">
+
+        <label>New username</label>
+        <input id="suUser" placeholder="choose a username">
+
+        <label>New password</label>
+        <input id="suPass" type="password" placeholder="choose a password">
+
+        <div id="patientOnlyFields">
+            <label>Language</label>
+            <select id="suLanguage">
+                <option value="English">English</option>
+                <option value="Swedish">Swedish</option>
+                <option value="Sinhala">Sinhala</option>
+                <option value="Tamil">Tamil</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label>Age group</label>
+            <select id="suAgeGroup">
+                <option value="18-30">18–30</option>
+                <option value="31-45">31–45</option>
+                <option value="46-60">46–60</option>
+                <option value="61-75">61–75</option>
+                <option value="76+">76+</option>
+            </select>
+        </div>
+
+        <button class="main" onclick="signup()">Create account</button>
+    </div>
+
+    <p id="msg"></p>
+</div>
+
+<script>
+    let currentRole = 'PATIENT';
+    const msgEl = document.getElementById('msg');
+
+    function setRole(role) {
+        currentRole = role;
+        document.getElementById('rolePatient').classList.toggle('active', role === 'PATIENT');
+        document.getElementById('roleTherapist').classList.toggle('active', role === 'THERAPIST');
+        document.getElementById('patientOnlyFields').style.display = role === 'PATIENT' ? 'block' : 'none';
+    }
+
+    function openSignup() {
+        msgEl.textContent = "";
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('signupBox').style.display = 'block';
+    }
+
+    async function signup() {
+        msgEl.textContent = "";
+        const name = document.getElementById('suName').value.trim();
+        const user = document.getElementById('suUser').value.trim();
+        const pass = document.getElementById('suPass').value.trim();
+        const language = document.getElementById('suLanguage').value;
+        const ageGroup = document.getElementById('suAgeGroup').value;
+
+        if (!name || !user || !pass) {
+            alert("Please fill all signup fields");
+            return;
+        }
+
+        const params = new URLSearchParams();
+        params.append("username", user);
+        params.append("password", pass);
+        params.append("name", name);
+
+        let endpoint;
+        if (currentRole === 'PATIENT') {
+            params.append("language", language);
+            params.append("ageGroup", ageGroup);
+            endpoint = '/api/auth/signup/patient';
+        } else {
+            endpoint = '/api/auth/signup/therapist';
+        }
+
+        try {
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+
+            if (!res.ok) {
+                msgEl.style.color = "#B91C1C";
+                msgEl.textContent = "Signup failed";
+                return;
+            }
+
+            const u = await res.json();
+
+            document.getElementById('signupBox').style.display = 'none';
+            document.getElementById('loginBox').style.display = 'block';
+
+            document.getElementById('suName').value = "";
+            document.getElementById('suUser').value = "";
+            document.getElementById('suPass').value = "";
+
+            msgEl.style.color = "#16A34A";
+            msgEl.textContent = "Account created for " + u.name + ". Please log in.";
+
+        } catch (e) {
+            msgEl.style.color = "#B91C1C";
+            msgEl.textContent = "Error during signup";
+        }
+    }
+
+    async function login() {
+        msgEl.textContent = "";
+        const user = document.getElementById('liUser').value.trim();
+        const pass = document.getElementById('liPass').value.trim();
+
+        if (!user || !pass) {
+            alert("Enter username and password");
+            return;
+        }
+
+        const params = new URLSearchParams();
+        params.append("username", user);
+        params.append("password", pass);
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+
+            if (res.status === 401) {
+                msgEl.style.color = "#B91C1C";
+                msgEl.textContent = "Invalid username or password.";
+                return;
+            }
+            if (!res.ok) {
+                msgEl.style.color = "#B91C1C";
+                msgEl.textContent = "Login failed (" + res.status + ")";
+                return;
+            }
+
+            const u = await res.json();
+
+            if (u.role === 'PATIENT') {
+                localStorage.setItem('patientId', u.id);
+                localStorage.setItem('patientName', u.name);
+                window.location.href = '/patient.html';
+            } else if (u.role === 'THERAPIST') {
+                localStorage.setItem('therapistId', u.id);
+                localStorage.setItem('therapistName', u.name);
+                window.location.href = '/therapist.html';
+            } else {
+                msgEl.style.color = "#B91C1C";
+                msgEl.textContent = "Unknown role: " + u.role;
+            }
+
+        } catch (e) {
+            msgEl.style.color = "#B91C1C";
+            msgEl.textContent = "Error connecting to server.";
+        }
+    }
+
+    setRole('PATIENT');
+</script>
+</body>
+</html>
