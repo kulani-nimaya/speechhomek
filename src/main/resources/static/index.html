@@ -5,147 +5,266 @@
     <title>Speech Home Practice</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body {
-            font-family: Inter, "Segoe UI", Arial, sans-serif;
-            background: linear-gradient(135deg,#EEF2FF,#E0F2FE);
+        :root{
+            --bg1:#f5f9ff;
+            --bg2:#eaf4ff;
+            --card:#ffffff;
+            --text:#1f2937;
+            --muted:#6b7280;
+            --primary:#6f98dd;
+            --primary2:#8ec8ad;
+            --border:#d8e3f0;
+            --soft:#f7fbff;
+            --danger:#b91c1c;
+            --success:#15803d;
+            --shadow:0 14px 34px rgba(15,23,42,.10);
+        }
+
+        *{ box-sizing:border-box; }
+
+        body{
+            margin:0;
+            min-height:100vh;
+            padding:18px;
+            font-family:Inter,"Segoe UI",Arial,sans-serif;
+            color:var(--text);
+            background:
+                    radial-gradient(circle at top left, #ffffff 0%, var(--bg1) 35%, var(--bg2) 100%);
             display:flex;
             justify-content:center;
             align-items:center;
-            min-height:100vh;
-            margin:0;
-            padding:16px;
         }
-        .card {
-            background:white;
-            padding:32px;
-            border-radius:24px;
-            box-shadow:0 10px 30px rgba(0,0,0,0.08);
-            width:440px;
+
+        .card{
+            width:460px;
             max-width:100%;
+            background:var(--card);
+            border-radius:28px;
+            box-shadow:var(--shadow);
+            border:1px solid rgba(219,227,238,.9);
+            overflow:hidden;
         }
-        h1 {
-            margin-top:0;
-            color:#1F2933;
-            text-align:center;
+
+        .hero{
+            background:linear-gradient(135deg,var(--primary),var(--primary2));
+            color:white;
+            padding:28px 26px 22px;
         }
-        .role-row {
+
+        .hero h1{
+            margin:0;
+            font-size:28px;
+            font-weight:800;
+            line-height:1.1;
+        }
+
+        .hero p{
+            margin:8px 0 0;
+            font-size:14px;
+            opacity:.95;
+            line-height:1.5;
+        }
+
+        .content{
+            padding:22px;
+        }
+
+        .role-row{
             display:flex;
-            gap:8px;
-            margin-bottom:16px;
+            gap:10px;
+            margin-bottom:18px;
+            background:#f3f8ff;
+            border:1px solid #dce8f6;
+            border-radius:999px;
+            padding:5px;
         }
-        .role-btn {
+
+        .role-btn{
             flex:1;
             text-align:center;
-            padding:10px;
-            border-radius:999px;
-            border:1px solid #CBD5E1;
-            cursor:pointer;
-            font-weight:bold;
-            background:white;
-            color:#1F2933;
-        }
-        .role-btn.active {
-            background:#3B82F6;
-            color:white;
-            border-color:#3B82F6;
-        }
-        label {
-            font-size:13px;
-            color:#4B5563;
-        }
-        input, select {
-            width:100%;
-            padding:8px;
-            border-radius:8px;
-            border:1px solid #CBD5E1;
-            margin:4px 0 10px 0;
-        }
-        button.main {
-            margin-top:8px;
-            padding:10px 16px;
+            padding:11px 12px;
             border-radius:999px;
             border:none;
-            background:#3B82F6;
+            cursor:pointer;
+            font-weight:800;
+            background:transparent;
+            color:#38506d;
+            transition:.18s ease;
+        }
+
+        .role-btn.active{
+            background:white;
+            color:#2f5ea4;
+            box-shadow:0 4px 12px rgba(59,130,246,.12);
+        }
+
+        .section-title{
+            font-size:15px;
+            font-weight:800;
+            margin:0 0 12px;
+            color:#334155;
+        }
+
+        label{
+            display:block;
+            font-size:13px;
+            font-weight:700;
+            color:#475569;
+            margin-bottom:6px;
+        }
+
+        input, select{
+            width:100%;
+            padding:11px 12px;
+            border-radius:12px;
+            border:1px solid var(--border);
+            margin:0 0 12px;
+            font-size:14px;
+            outline:none;
+            background:white;
+        }
+
+        input:focus, select:focus{
+            border-color:#7aa4e2;
+            box-shadow:0 0 0 3px rgba(122,164,226,.12);
+        }
+
+        .main-btn{
+            margin-top:6px;
+            padding:12px 16px;
+            border-radius:999px;
+            border:none;
+            background:linear-gradient(135deg,var(--primary),var(--primary2));
             color:white;
-            font-weight:bold;
+            font-weight:800;
             cursor:pointer;
             width:100%;
+            font-size:14px;
         }
-        button.secondary {
-            margin-top:8px;
-            padding:8px 14px;
+
+        .secondary-btn{
+            margin-top:10px;
+            padding:11px 14px;
             border-radius:999px;
-            border:1px solid #3B82F6;
+            border:1px solid #8fb3e5;
             background:white;
-            color:#3B82F6;
-            font-weight:bold;
+            color:#3964a8;
+            font-weight:800;
             cursor:pointer;
             width:100%;
             font-size:13px;
         }
-        #signupBox {
-            margin-top:12px;
-            padding-top:8px;
-            border-top:1px dashed #E5E7EB;
-            display:none;
+
+        .soft-box{
+            background:var(--soft);
+            border:1px solid #e5eef8;
+            border-radius:18px;
+            padding:14px;
+            margin-top:10px;
         }
-        #msg { margin-top:6px; font-size:13px; }
+
+        #signupBox{
+            display:none;
+            margin-top:6px;
+        }
+
+        #msg{
+            margin:14px 2px 0;
+            font-size:13px;
+            font-weight:700;
+            min-height:18px;
+        }
+
+        .tiny-note{
+            font-size:12px;
+            color:var(--muted);
+            margin-top:-4px;
+            margin-bottom:10px;
+            line-height:1.5;
+        }
+
+        .back-link{
+            margin-top:12px;
+            text-align:center;
+        }
+
+        .back-link button{
+            border:none;
+            background:transparent;
+            color:#3964a8;
+            font-weight:800;
+            cursor:pointer;
+            font-size:13px;
+        }
     </style>
 </head>
 <body>
 <div class="card">
-    <h1>Speech Home Practice</h1>
-
-    <div class="role-row">
-        <div id="rolePatient" class="role-btn active" onclick="setRole('PATIENT')">Patient</div>
-        <div id="roleTherapist" class="role-btn" onclick="setRole('THERAPIST')">Therapist</div>
+    <div class="hero">
+        <h1>Speech Home Practice</h1>
+        <p>Practice at home, review progress, and stay connected with your therapist.</p>
     </div>
 
-    <div id="loginBox">
-        <label>Username</label>
-        <input id="liUser" placeholder="your username">
-
-        <label>Password</label>
-        <input id="liPass" type="password" placeholder="your password">
-
-        <button class="main" onclick="login()">Log in</button>
-        <button class="secondary" onclick="openSignup()">Create new account</button>
-    </div>
-
-    <div id="signupBox">
-        <label>Full name</label>
-        <input id="suName" placeholder="e.g. Nimaya">
-
-        <label>New username</label>
-        <input id="suUser" placeholder="choose a username">
-
-        <label>New password</label>
-        <input id="suPass" type="password" placeholder="choose a password">
-
-        <div id="patientOnlyFields">
-            <label>Language</label>
-            <select id="suLanguage">
-                <option value="English">English</option>
-                <option value="Swedish">Swedish</option>
-                <option value="Sinhala">Sinhala</option>
-                <option value="Tamil">Tamil</option>
-                <option value="Other">Other</option>
-            </select>
-
-            <label>Age group</label>
-            <select id="suAgeGroup">
-                <option value="18-30">18–30</option>
-                <option value="31-45">31–45</option>
-                <option value="46-60">46–60</option>
-                <option value="61-75">61–75</option>
-                <option value="76+">76+</option>
-            </select>
+    <div class="content">
+        <div class="role-row">
+            <button id="rolePatient" class="role-btn active" onclick="setRole('PATIENT')">Patient</button>
+            <button id="roleTherapist" class="role-btn" onclick="setRole('THERAPIST')">Therapist</button>
         </div>
 
-        <button class="main" onclick="signup()">Create account</button>
-    </div>
+        <div id="loginBox">
+            <div class="section-title">Log in</div>
 
-    <p id="msg"></p>
+            <label for="liUser">Username</label>
+            <input id="liUser" placeholder="Enter your username">
+
+            <label for="liPass">Password</label>
+            <input id="liPass" type="password" placeholder="Enter your password">
+
+            <button class="main-btn" onclick="login()">Log in</button>
+            <button class="secondary-btn" onclick="openSignup()">Create new account</button>
+        </div>
+
+        <div id="signupBox">
+            <div class="section-title">Create account</div>
+
+            <div class="soft-box">
+                <label for="suName">Full name</label>
+                <input id="suName" placeholder="e.g. Nimaya Silva">
+
+                <label for="suUser">New username</label>
+                <input id="suUser" placeholder="Choose a username">
+
+                <label for="suPass">New password</label>
+                <input id="suPass" type="password" placeholder="Choose a password">
+            </div>
+
+            <div id="patientOnlyFields" class="soft-box">
+                <label for="suLanguage">Language</label>
+                <select id="suLanguage">
+                    <option value="English">English</option>
+                    <option value="Swedish">Swedish</option>
+                    <option value="Sinhala">Sinhala</option>
+                    <option value="Tamil">Tamil</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <label for="suDOB">Date of birth</label>
+                <input id="suDOB" type="date">
+
+                <div class="tiny-note">
+                    This is used to calculate age automatically for the therapist dashboard.
+                </div>
+            </div>
+
+            <button class="main-btn" onclick="signup()">Create account</button>
+
+            <div class="back-link">
+                <button onclick="backToLogin()">Back to login</button>
+            </div>
+        </div>
+
+        <p id="msg"></p>
+    </div>
 </div>
 
 <script>
@@ -154,39 +273,58 @@
 
     function setRole(role) {
         currentRole = role;
+
         document.getElementById('rolePatient').classList.toggle('active', role === 'PATIENT');
         document.getElementById('roleTherapist').classList.toggle('active', role === 'THERAPIST');
-        document.getElementById('patientOnlyFields').style.display = role === 'PATIENT' ? 'block' : 'none';
+
+        document.getElementById('patientOnlyFields').style.display =
+            role === 'PATIENT' ? 'block' : 'none';
+
+        msgEl.textContent = '';
     }
 
     function openSignup() {
-        msgEl.textContent = "";
+        msgEl.textContent = '';
         document.getElementById('loginBox').style.display = 'none';
         document.getElementById('signupBox').style.display = 'block';
     }
 
+    function backToLogin() {
+        msgEl.textContent = '';
+        document.getElementById('signupBox').style.display = 'none';
+        document.getElementById('loginBox').style.display = 'block';
+    }
+
     async function signup() {
-        msgEl.textContent = "";
+        msgEl.textContent = '';
+
         const name = document.getElementById('suName').value.trim();
         const user = document.getElementById('suUser').value.trim();
         const pass = document.getElementById('suPass').value.trim();
         const language = document.getElementById('suLanguage').value;
-        const ageGroup = document.getElementById('suAgeGroup').value;
+        const dateOfBirth = document.getElementById('suDOB').value;
 
         if (!name || !user || !pass) {
-            alert("Please fill all signup fields");
+            msgEl.style.color = '#B91C1C';
+            msgEl.textContent = 'Please fill all required signup fields.';
+            return;
+        }
+
+        if (currentRole === 'PATIENT' && !dateOfBirth) {
+            msgEl.style.color = '#B91C1C';
+            msgEl.textContent = 'Please select the patient date of birth.';
             return;
         }
 
         const params = new URLSearchParams();
-        params.append("username", user);
-        params.append("password", pass);
-        params.append("name", name);
+        params.append('username', user);
+        params.append('password', pass);
+        params.append('name', name);
 
         let endpoint;
         if (currentRole === 'PATIENT') {
-            params.append("language", language);
-            params.append("ageGroup", ageGroup);
+            params.append('language', language);
+            params.append('dateOfBirth', dateOfBirth);
             endpoint = '/api/auth/signup/patient';
         } else {
             endpoint = '/api/auth/signup/therapist';
@@ -200,42 +338,44 @@
             });
 
             if (!res.ok) {
-                msgEl.style.color = "#B91C1C";
-                msgEl.textContent = "Signup failed";
+                msgEl.style.color = '#B91C1C';
+                msgEl.textContent = 'Signup failed.';
                 return;
             }
 
             const u = await res.json();
 
+            document.getElementById('suName').value = '';
+            document.getElementById('suUser').value = '';
+            document.getElementById('suPass').value = '';
+            document.getElementById('suDOB').value = '';
+
             document.getElementById('signupBox').style.display = 'none';
             document.getElementById('loginBox').style.display = 'block';
 
-            document.getElementById('suName').value = "";
-            document.getElementById('suUser').value = "";
-            document.getElementById('suPass').value = "";
-
-            msgEl.style.color = "#16A34A";
-            msgEl.textContent = "Account created for " + u.name + ". Please log in.";
-
+            msgEl.style.color = '#15803D';
+            msgEl.textContent = 'Account created for ' + (u.name || 'user') + '. Please log in.';
         } catch (e) {
-            msgEl.style.color = "#B91C1C";
-            msgEl.textContent = "Error during signup";
+            msgEl.style.color = '#B91C1C';
+            msgEl.textContent = 'Error during signup.';
         }
     }
 
     async function login() {
-        msgEl.textContent = "";
+        msgEl.textContent = '';
+
         const user = document.getElementById('liUser').value.trim();
         const pass = document.getElementById('liPass').value.trim();
 
         if (!user || !pass) {
-            alert("Enter username and password");
+            msgEl.style.color = '#B91C1C';
+            msgEl.textContent = 'Enter username and password.';
             return;
         }
 
         const params = new URLSearchParams();
-        params.append("username", user);
-        params.append("password", pass);
+        params.append('username', user);
+        params.append('password', pass);
 
         try {
             const res = await fetch('/api/auth/login', {
@@ -245,13 +385,14 @@
             });
 
             if (res.status === 401) {
-                msgEl.style.color = "#B91C1C";
-                msgEl.textContent = "Invalid username or password.";
+                msgEl.style.color = '#B91C1C';
+                msgEl.textContent = 'Invalid username or password.';
                 return;
             }
+
             if (!res.ok) {
-                msgEl.style.color = "#B91C1C";
-                msgEl.textContent = "Login failed (" + res.status + ")";
+                msgEl.style.color = '#B91C1C';
+                msgEl.textContent = 'Login failed (' + res.status + ').';
                 return;
             }
 
@@ -259,20 +400,19 @@
 
             if (u.role === 'PATIENT') {
                 localStorage.setItem('patientId', u.id);
-                localStorage.setItem('patientName', u.name);
+                localStorage.setItem('patientName', u.name || '');
                 window.location.href = '/patient.html';
             } else if (u.role === 'THERAPIST') {
                 localStorage.setItem('therapistId', u.id);
-                localStorage.setItem('therapistName', u.name);
+                localStorage.setItem('therapistName', u.name || '');
                 window.location.href = '/therapist.html';
             } else {
-                msgEl.style.color = "#B91C1C";
-                msgEl.textContent = "Unknown role: " + u.role;
+                msgEl.style.color = '#B91C1C';
+                msgEl.textContent = 'Unknown role: ' + u.role;
             }
-
         } catch (e) {
-            msgEl.style.color = "#B91C1C";
-            msgEl.textContent = "Error connecting to server.";
+            msgEl.style.color = '#B91C1C';
+            msgEl.textContent = 'Error connecting to server.';
         }
     }
 

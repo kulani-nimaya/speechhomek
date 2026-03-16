@@ -1,187 +1,741 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Therapist Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: Inter, "Segoe UI", Arial, sans-serif; background:#F3F4F6; margin:0; }
-        header {
-            background:linear-gradient(90deg,#2563eb,#7c3aed);
+        :root{
+            --bg:#eef3fb;
+            --card:#ffffff;
+            --text:#1f2937;
+            --muted:#6b7280;
+            --blue:#6f98dd;
+            --teal:#8ec8ad;
+            --good:#7acb88;
+            --good-soft:#eaf8ee;
+            --good-dark:#226a35;
+            --warn:#f3b35d;
+            --warn-soft:#fff4e3;
+            --warn-dark:#8b5b11;
+            --danger:#ee8b85;
+            --danger-soft:#ffe9e8;
+            --danger-dark:#a73e39;
+            --soft:#f8fbff;
+            --soft-border:#dce8f6;
+            --shadow:0 10px 28px rgba(15,23,42,.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        body{
+            margin:0;
+            font-family:Inter,"Segoe UI",Arial,sans-serif;
+            background:linear-gradient(180deg,#f8fbff 0%, var(--bg) 100%);
+            color:var(--text);
+        }
+
+        header{
+            background:linear-gradient(135deg,var(--blue),var(--teal));
             color:white;
-            padding:16px 24px;
+            padding:20px 22px 26px;
+            border-bottom-left-radius:28px;
+            border-bottom-right-radius:28px;
+            box-shadow:0 10px 24px rgba(95,143,220,.2);
+        }
+
+        .header-row{
             display:flex;
             justify-content:space-between;
+            align-items:flex-start;
+            gap:14px;
+            flex-wrap:wrap;
+        }
+
+        .title-main{
+            font-size:26px;
+            font-weight:800;
+            line-height:1.1;
+        }
+
+        .subtitle{
+            font-size:14px;
+            opacity:.95;
+            margin-top:6px;
+        }
+
+        .top-right{
+            display:flex;
             align-items:center;
+            gap:10px;
+            flex-wrap:wrap;
         }
-        .title-main { font-size:20px; font-weight:bold; }
-        .subtitle { font-size:13px; opacity:0.9; }
-        .container {
-            padding:24px;
-            display:grid;
-            grid-template-columns: 1.2fr 2fr;
-            gap:16px;
-        }
-        .card {
-            background:white;
-            border-radius:16px;
-            padding:16px 20px;
-            box-shadow:0 4px 16px rgba(0,0,0,0.06);
-        }
-        h2 { margin-top:0; }
-        table { width:100%; border-collapse:collapse; margin-top:8px; }
-        th, td { padding:6px 8px; border-bottom:1px solid #E5E7EB; font-size:13px; vertical-align: top; }
-        tr.clickable:hover { background:#EFF6FF; cursor:pointer; }
-        .badge {
-            display:inline-block;
-            padding:3px 8px;
+
+        .name-chip{
+            background:rgba(255,255,255,.18);
+            border:1px solid rgba(255,255,255,.24);
             border-radius:999px;
-            font-size:11px;
-            font-weight:bold;
+            padding:10px 14px;
+            font-size:14px;
+            font-weight:700;
         }
-        .badge.good { background:#DCFCE7; color:#166534; }
-        .badge.fast { background:#FEE2E2; color:#B91C1C; }
-        .badge.slow { background:#FEF3C7; color:#92400E; }
-        .info-row { display:flex; gap:16px; font-size:13px; color:#4B5563; margin-bottom:6px; }
-        .label { font-weight:bold; min-width:90px; }
-        button {
-            padding:8px 14px;
-            border-radius:999px;
+
+        button{
             border:none;
-            background:#3B82F6;
-            color:white;
-            font-weight:bold;
+            border-radius:999px;
+            padding:10px 14px;
+            font-weight:700;
             cursor:pointer;
             font-size:13px;
         }
-        textarea, input, select {
-            width:100%;
-            margin-top:4px;
-            padding:6px;
-            border-radius:8px;
-            border:1px solid #CBD5E1;
-            font-size:13px;
+
+        .logout-btn{
+            background:rgba(255,255,255,.18);
+            color:white;
         }
-        .danger-btn {
+
+        .primary-btn{
+            background:#4b85dd;
+            color:white;
+        }
+
+        .danger-btn{
             background:#dc2626;
+            color:white;
         }
-        @media (max-width: 860px) {
-            .container {
-                grid-template-columns: 1fr;
+
+        .template-chip{
+            background:#eef6ff;
+            color:#365985;
+            border:1px solid #d6e5f9;
+            border-radius:999px;
+            padding:8px 12px;
+            font-size:12px;
+            font-weight:700;
+            cursor:pointer;
+        }
+
+        .page{
+            max-width:1180px;
+            margin:0 auto;
+            padding:18px;
+            display:grid;
+            gap:18px;
+        }
+
+        .stats-grid{
+            display:grid;
+            grid-template-columns:repeat(4,1fr);
+            gap:14px;
+        }
+
+        .stat-card{
+            background:white;
+            border-radius:22px;
+            padding:16px 18px;
+            box-shadow:var(--shadow);
+            border:1px solid rgba(219,227,238,.9);
+        }
+
+        .stat-top{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+        }
+
+        .stat-label{
+            font-size:13px;
+            color:var(--muted);
+        }
+
+        .stat-value{
+            font-size:28px;
+            font-weight:900;
+            color:#2d405a;
+            margin-top:4px;
+        }
+
+        .stat-icon{
+            width:44px;
+            height:44px;
+            border-radius:14px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:20px;
+        }
+
+        .icon-blue{ background:#ebf3ff; }
+        .icon-green{ background:#eaf8ee; }
+        .icon-orange{ background:#fff4e8; }
+        .icon-red{ background:#fff0ef; }
+
+        .card{
+            background:var(--card);
+            border-radius:24px;
+            padding:18px;
+            box-shadow:var(--shadow);
+            border:1px solid rgba(219,227,238,.9);
+        }
+
+        .section-head{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+            flex-wrap:wrap;
+            margin-bottom:12px;
+        }
+
+        .section-head h2{
+            margin:0;
+            font-size:20px;
+            font-weight:800;
+        }
+
+        .section-note{
+            font-size:13px;
+            color:var(--muted);
+        }
+
+        input, textarea, select{
+            width:100%;
+            border:1px solid #cfd9e6;
+            border-radius:12px;
+            padding:10px 12px;
+            font-size:14px;
+            outline:none;
+            background:white;
+        }
+
+        input:focus, textarea:focus, select:focus{
+            border-color:#7aa4e2;
+            box-shadow:0 0 0 3px rgba(122,164,226,.12);
+        }
+
+        #patientSearch{
+            max-width:320px;
+        }
+
+        .patient-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+            gap:12px;
+        }
+
+        .patient-tile{
+            border:1px solid #dce7f3;
+            background:#fbfdff;
+            border-radius:20px;
+            padding:14px;
+            cursor:pointer;
+            transition:.18s ease;
+        }
+
+        .patient-tile:hover{
+            transform:translateY(-2px);
+            box-shadow:0 12px 24px rgba(30,41,59,.08);
+        }
+
+        .patient-tile.active{
+            border:2px solid #7aa4e2;
+            background:#f2f7ff;
+        }
+
+        .patient-name{
+            font-size:16px;
+            font-weight:800;
+            margin-bottom:4px;
+        }
+
+        .patient-sub{
+            font-size:13px;
+            color:var(--muted);
+        }
+
+        .tile-footer{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:10px;
+            margin-top:12px;
+        }
+
+        .badge{
+            display:inline-block;
+            padding:6px 11px;
+            border-radius:999px;
+            font-size:12px;
+            font-weight:800;
+        }
+
+        .badge.good{ background:var(--good-soft); color:var(--good-dark); }
+        .badge.slow{ background:var(--warn-soft); color:var(--warn-dark); }
+        .badge.fast{ background:var(--danger-soft); color:var(--danger-dark); }
+        .badge.neutral{ background:#eef2f7; color:#475569; }
+
+        .selected-shell{
+            display:none;
+            gap:18px;
+        }
+
+        .patient-hero{
+            background:linear-gradient(135deg,#f7fbff 0%,#eef6ff 45%,#eefaf4 100%);
+            border:1px solid #dbe8f8;
+        }
+
+        .hero-row{
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            gap:16px;
+            flex-wrap:wrap;
+        }
+
+        .hero-name{
+            font-size:28px;
+            font-weight:900;
+            line-height:1.1;
+        }
+
+        .hero-sub{
+            margin-top:6px;
+            color:#5d7188;
+            font-size:14px;
+        }
+
+        .hero-meta{
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            gap:10px;
+            margin-top:16px;
+        }
+
+        .meta-pill{
+            background:white;
+            border:1px solid #dce7f3;
+            border-radius:16px;
+            padding:12px;
+        }
+
+        .meta-label{
+            font-size:12px;
+            color:var(--muted);
+            margin-bottom:6px;
+        }
+
+        .meta-value{
+            font-size:15px;
+            font-weight:800;
+            color:#31445e;
+        }
+
+        .summary-grid{
+            display:grid;
+            grid-template-columns:repeat(4,1fr);
+            gap:14px;
+        }
+
+        .summary-card{
+            border-radius:20px;
+            padding:16px;
+            border:1px solid #dbe7f2;
+        }
+
+        .summary-card.blue{ background:#eef6ff; }
+        .summary-card.green{ background:#edf8ef; }
+        .summary-card.orange{ background:#fff6e8; }
+        .summary-card.red{ background:#fff0ef; }
+
+        .summary-kicker{
+            font-size:13px;
+            color:#61758d;
+        }
+
+        .summary-big{
+            font-size:30px;
+            font-weight:900;
+            margin-top:6px;
+        }
+
+        .summary-small{
+            font-size:13px;
+            color:#64748b;
+            margin-top:4px;
+        }
+
+        .two-col{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:18px;
+        }
+
+        .field-grid{
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:12px;
+        }
+
+        label{
+            display:block;
+            font-size:13px;
+            font-weight:700;
+            color:#475569;
+            margin-bottom:6px;
+        }
+
+        .save-row{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-top:12px;
+        }
+
+        .status-text{
+            font-size:12px;
+            font-weight:700;
+        }
+
+        .template-row{
+            display:flex;
+            gap:8px;
+            flex-wrap:wrap;
+            margin:10px 0 12px;
+        }
+
+        .msg-list{
+            display:grid;
+            gap:10px;
+            margin-top:12px;
+        }
+
+        .msg-item{
+            background:#f8fbff;
+            border:1px solid #e2edf9;
+            border-radius:16px;
+            padding:12px;
+        }
+
+        .msg-content{
+            font-size:14px;
+            line-height:1.6;
+            white-space:pre-wrap;
+        }
+
+        .msg-foot{
+            margin-top:8px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:8px;
+            flex-wrap:wrap;
+            font-size:12px;
+            color:var(--muted);
+        }
+
+        .table-wrap{
+            overflow:auto;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        th, td{
+            padding:11px 10px;
+            border-bottom:1px solid #e7edf5;
+            text-align:left;
+            font-size:13px;
+            vertical-align:top;
+        }
+
+        th{
+            color:#5a7088;
+            font-weight:800;
+        }
+
+        .empty{
+            color:var(--muted);
+            font-size:14px;
+            padding:8px 0;
+        }
+
+        .chart-wrap{
+            position:relative;
+            width:100%;
+            height:320px;
+            min-height:320px;
+            max-height:320px;
+            overflow:hidden;
+        }
+
+        #rateChart{
+            width:100% !important;
+            height:100% !important;
+            display:block;
+        }
+
+        @media (max-width: 980px){
+            .stats-grid,
+            .summary-grid,
+            .hero-meta,
+            .field-grid,
+            .two-col{
+                grid-template-columns:1fr;
+            }
+
+            .chart-wrap{
+                height:280px;
+                min-height:280px;
+                max-height:280px;
             }
         }
     </style>
 </head>
 <body>
 <header>
-    <div>
-        <div class="title-main">Therapist Dashboard</div>
-        <div class="subtitle">Monitor patient home-practice progress.</div>
-    </div>
-    <div>
-        <span id="therapistName" style="margin-right:12px;"></span>
-        <button onclick="logout()">Logout</button>
+    <div class="header-row">
+        <div>
+            <div class="title-main">Therapist Dashboard</div>
+            <div class="subtitle">Monitor patient progress and send practice guidance.</div>
+        </div>
+        <div class="top-right">
+            <div id="therapistName" class="name-chip">Therapist</div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
     </div>
 </header>
 
-<div class="container">
-    <div class="card">
-        <h2>Patients</h2>
-        <table id="patientsTable">
-            <thead>
-            <tr><th>Name</th><th>Username</th></tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-
-    <div class="card">
-        <h2>Patient Details</h2>
-        <div id="selectedPatientInfo" style="font-size:13px;color:#6B7280;">
-            No patient selected.
-        </div>
-
-        <div id="editDetailsBox" style="margin-top:14px; display:none;">
-            <div style="font-size:13px;font-weight:bold;color:#4B5563;">Edit patient details</div>
-
-            <label>Name</label>
-            <input id="editName">
-
-            <label>Language</label>
-            <select id="editLanguage">
-                <option value="English">English</option>
-                <option value="Swedish">Swedish</option>
-                <option value="Sinhala">Sinhala</option>
-                <option value="Tamil">Tamil</option>
-                <option value="Other">Other</option>
-            </select>
-
-            <label>Age group</label>
-            <select id="editAgeGroup">
-                <option value="18-30">18–30</option>
-                <option value="31-45">31–45</option>
-                <option value="46-60">46–60</option>
-                <option value="61-75">61–75</option>
-                <option value="76+">76+</option>
-            </select>
-
-            <label>Diagnosis</label>
-            <select id="editDiagnosis">
-                <option value="Dysarthria">Dysarthria</option>
-                <option value="Dysarthria – Stroke">Dysarthria – Stroke</option>
-                <option value="Dysarthria – Parkinson’s disease">Dysarthria – Parkinson’s disease</option>
-                <option value="Dysarthria – Cerebral palsy">Dysarthria – Cerebral palsy</option>
-                <option value="Dysarthria – Traumatic brain injury">Dysarthria – Traumatic brain injury</option>
-                <option value="Dysarthria – Other">Dysarthria – Other</option>
-            </select>
-
-            <button style="margin-top:8px;" onclick="savePatientDetails()">Save patient details</button>
-            <span id="detailsStatus" style="margin-left:8px; font-size:12px;"></span>
-        </div>
-
-        <div id="newNoteBox" style="margin-top:14px; display:none;">
-            <div style="font-size:13px;font-weight:bold;color:#4B5563;">Send new message / instructions</div>
-            <textarea id="newNoteText" rows="3" placeholder="Write instructions for home practice..."></textarea>
-            <button style="margin-top:6px;" onclick="sendNote()">Send message</button>
-            <span id="noteStatus" style="margin-left:8px; font-size:12px;"></span>
-        </div>
-
-        <div id="noteHistoryBox" style="margin-top:14px; display:none;">
-            <div style="font-size:13px;color:#4B5563;font-weight:bold;">Latest messages</div>
-            <table id="notesTable">
-                <thead>
-                <tr><th>Date</th><th>Message</th><th>Action</th></tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-
-        <div id="targetsBox" style="margin-top:14px; display:none;">
-            <div class="info-row">
-                <span class="label">Target rate:</span>
-                <span>
-          <input id="targetLow" type="number" step="0.1" style="width:70px;"> –
-          <input id="targetHigh" type="number" step="0.1" style="width:70px;">
-          <span style="font-size:12px;color:#6B7280;">syll/sec</span>
-        </span>
+<div class="page">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-top">
+                <div>
+                    <div class="stat-label">Total patients</div>
+                    <div id="statTotalPatients" class="stat-value">0</div>
+                </div>
+                <div class="stat-icon icon-blue">👥</div>
             </div>
-            <button style="margin-top:4px;" onclick="saveTargets()">Save target range</button>
-            <span id="targetsStatus" style="margin-left:8px; font-size:12px;"></span>
         </div>
-
-        <table id="sessionsTable" style="margin-top:14px; display:none;">
-            <thead>
-            <tr><th>Date</th><th>Rate</th><th>Feedback</th></tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="stat-card">
+            <div class="stat-top">
+                <div>
+                    <div class="stat-label">Active this week</div>
+                    <div id="statActiveWeek" class="stat-value">0</div>
+                </div>
+                <div class="stat-icon icon-green">✅</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-top">
+                <div>
+                    <div class="stat-label">Need follow-up</div>
+                    <div id="statNeedFollowUp" class="stat-value">0</div>
+                </div>
+                <div class="stat-icon icon-orange">⚠️</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-top">
+                <div>
+                    <div class="stat-label">Out of target</div>
+                    <div id="statOutOfRange" class="stat-value">0</div>
+                </div>
+                <div class="stat-icon icon-red">📌</div>
+            </div>
+        </div>
     </div>
 
-    <div class="card" style="grid-column:1 / span 2;">
-        <h2>Speech rate trend</h2>
-        <p id="chartSubtitle" style="font-size:13px;color:#6B7280;">Select a patient to see their trend.</p>
-        <canvas id="rateChart" height="80"></canvas>
+    <div class="card">
+        <div class="section-head">
+            <div>
+                <h2>Patients</h2>
+                <div class="section-note">Select a patient to open the full detail view.</div>
+            </div>
+            <input id="patientSearch" placeholder="Search patient name or username..." oninput="renderPatientTiles()">
+        </div>
+        <div id="patientGrid" class="patient-grid"></div>
+    </div>
+
+    <div id="selectedPatientShell" class="selected-shell">
+        <div class="card patient-hero">
+            <div class="hero-row">
+                <div>
+                    <div id="heroName" class="hero-name">No patient selected</div>
+                    <div id="heroSub" class="hero-sub">Choose a patient above.</div>
+                </div>
+                <div id="heroStatus"></div>
+            </div>
+
+            <div class="hero-meta">
+                <div class="meta-pill">
+                    <div class="meta-label">Username</div>
+                    <div id="metaUsername" class="meta-value">-</div>
+                </div>
+                <div class="meta-pill">
+                    <div class="meta-label">Language</div>
+                    <div id="metaLanguage" class="meta-value">-</div>
+                </div>
+                <div class="meta-pill">
+                    <div class="meta-label">Diagnosis</div>
+                    <div id="metaDiagnosis" class="meta-value">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="summaryGrid" class="summary-grid"></div>
+
+        <div class="card">
+            <div class="section-head">
+                <div>
+                    <h2>Speech rate trend</h2>
+                    <div id="chartSubtitle" class="section-note">Select a patient to see trend.</div>
+                </div>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="rateChart"></canvas>
+            </div>
+        </div>
+
+        <div class="two-col">
+            <div class="card">
+                <div class="section-head">
+                    <div>
+                        <h2>Edit patient details</h2>
+                        <div class="section-note">Update name, language, and diagnosis.</div>
+                    </div>
+                </div>
+
+                <div class="field-grid">
+                    <div>
+                        <label for="editName">Name</label>
+                        <input id="editName">
+                    </div>
+
+                    <div>
+                        <label for="editLanguage">Language</label>
+                        <select id="editLanguage">
+                            <option value="English">English</option>
+                            <option value="Swedish">Swedish</option>
+                            <option value="Sinhala">Sinhala</option>
+                            <option value="Tamil">Tamil</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div style="grid-column:1 / -1;">
+                        <label for="editDiagnosis">Diagnosis</label>
+                        <select id="editDiagnosis" onchange="toggleOtherDiagnosis()">
+                            <option value="Dysarthria">Dysarthria</option>
+                            <option value="Dysarthria – Stroke">Dysarthria – Stroke</option>
+                            <option value="Dysarthria – Parkinson’s disease">Dysarthria – Parkinson’s disease</option>
+                            <option value="Dysarthria – Cerebral palsy">Dysarthria – Cerebral palsy</option>
+                            <option value="Dysarthria – Traumatic brain injury">Dysarthria – Traumatic brain injury</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="otherDiagnosisWrap" style="display:none; margin-top:12px;">
+                    <label for="otherDiagnosisText">Specify other diagnosis</label>
+                    <input id="otherDiagnosisText" placeholder="Enter the specific diagnosis">
+                </div>
+
+                <div class="save-row">
+                    <button class="primary-btn" onclick="savePatientDetails()">Save patient details</button>
+                    <span id="detailsStatus" class="status-text"></span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-head">
+                    <div>
+                        <h2>Target speech rate</h2>
+                        <div class="section-note">Set the target syllables per second.</div>
+                    </div>
+                </div>
+
+                <div class="field-grid">
+                    <div>
+                        <label for="targetLow">Target low</label>
+                        <input id="targetLow" type="number" step="0.1">
+                    </div>
+                    <div>
+                        <label for="targetHigh">Target high</label>
+                        <input id="targetHigh" type="number" step="0.1">
+                    </div>
+                </div>
+
+                <div class="save-row">
+                    <button class="primary-btn" onclick="saveTargets()">Save target range</button>
+                    <span id="targetsStatus" class="status-text"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="two-col">
+            <div class="card">
+                <div class="section-head">
+                    <div>
+                        <h2>Send therapist message</h2>
+                        <div class="section-note">Write guidance for home practice.</div>
+                    </div>
+                </div>
+
+                <div class="template-row">
+                    <button class="template-chip" onclick="useTemplate('Great work. Keep your pace steady and clear.')">Great work</button>
+                    <button class="template-chip" onclick="useTemplate('Please slow down slightly and keep each word clear.')">Slow down</button>
+                    <button class="template-chip" onclick="useTemplate('Try to speak a little louder and keep the microphone closer.')">Speak louder</button>
+                    <button class="template-chip" onclick="useTemplate('Practice 3 short recordings today and focus on a comfortable rhythm.')">Practice plan</button>
+                </div>
+
+                <label for="newNoteText">Message</label>
+                <textarea id="newNoteText" rows="5" placeholder="Write instructions for the patient..."></textarea>
+
+                <div class="save-row">
+                    <button class="primary-btn" onclick="sendNote()">Send message</button>
+                    <span id="noteStatus" class="status-text"></span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-head">
+                    <div>
+                        <h2>Latest messages</h2>
+                        <div class="section-note">Recent therapist instructions.</div>
+                    </div>
+                </div>
+
+                <div id="messagesEmpty" class="empty">No messages yet.</div>
+                <div id="msgList" class="msg-list"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-head">
+                <div>
+                    <h2>Recent sessions</h2>
+                    <div class="section-note">Latest recordings and feedback.</div>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table id="sessionsTable">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Rate</th>
+                        <th>Feedback</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -189,83 +743,423 @@
     let therapistName = localStorage.getItem('therapistName');
     let therapistId = localStorage.getItem('therapistId');
     let currentPatientId = null;
+    let currentPatient = null;
+    let allPatients = [];
+    let chartInstance = null;
 
     if (!therapistId) {
         window.location.href = '/';
     } else {
-        document.getElementById('therapistName').textContent = therapistName;
+        document.getElementById('therapistName').textContent = therapistName || 'Therapist';
     }
+
+    const targetZonePlugin = {
+        id: 'targetZonePlugin',
+        beforeDatasetsDraw(chart) {
+            const opts = chart.options.plugins.targetZonePlugin || {};
+            const low = opts.low;
+            const high = opts.high;
+            if (low == null || high == null) return;
+
+            const yScale = chart.scales.y;
+            const chartArea = chart.chartArea;
+            if (!yScale || !chartArea) return;
+
+            const yTop = yScale.getPixelForValue(high);
+            const yBottom = yScale.getPixelForValue(low);
+
+            const ctx = chart.ctx;
+            ctx.save();
+            ctx.fillStyle = 'rgba(122, 203, 136, 0.16)';
+            ctx.fillRect(chartArea.left, yTop, chartArea.right - chartArea.left, yBottom - yTop);
+            ctx.strokeStyle = 'rgba(95, 170, 110, 0.55)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(chartArea.left, yTop);
+            ctx.lineTo(chartArea.right, yTop);
+            ctx.moveTo(chartArea.left, yBottom);
+            ctx.lineTo(chartArea.right, yBottom);
+            ctx.stroke();
+            ctx.restore();
+        }
+    };
+
+    Chart.register(targetZonePlugin);
 
     async function loadPatients() {
         try {
             const res = await fetch('/api/therapist/patients');
             if (!res.ok) return;
-            const patients = await res.json();
-            const tbody = document.querySelector('#patientsTable tbody');
-            tbody.innerHTML = '';
 
-            patients.forEach(p => {
-                const tr = document.createElement('tr');
-                tr.classList.add('clickable');
-                tr.onclick = () => selectPatient(p);
-                tr.innerHTML =
-                    '<td>' + (p.name || '') + '</td>' +
-                    '<td>' + (p.username || '') + '</td>';
-                tbody.appendChild(tr);
-            });
+            allPatients = await res.json();
+
+            await Promise.all(allPatients.map(async p => {
+                p._sessions = await fetchPatientSessions(p.id);
+                p._notes = await fetchPatientNotes(p.id);
+                p._summary = buildPatientSummary(p, p._sessions);
+            }));
+
+            renderTopStats();
+            renderPatientTiles();
         } catch (e) {
-            console.error("Error loading patients", e);
+            console.error('Error loading patients', e);
         }
+    }
+
+    async function fetchPatientSessions(patientId) {
+        try {
+            const res = await fetch('/api/patients/' + patientId + '/sessions');
+            if (!res.ok) return [];
+            return await res.json();
+        } catch (e) {
+            console.error('Error loading sessions', e);
+            return [];
+        }
+    }
+
+    async function fetchPatientNotes(patientId) {
+        try {
+            const res = await fetch('/api/patients/' + patientId + '/notes');
+            if (!res.ok) return [];
+            return await res.json();
+        } catch (e) {
+            console.error('Error loading notes', e);
+            return [];
+        }
+    }
+
+    function renderTopStats() {
+        const total = allPatients.length;
+        const activeWeek = allPatients.filter(p => p._summary.sessionsThisWeek > 0).length;
+        const needFollowUp = allPatients.filter(p => p._summary.daysSinceLast == null || p._summary.daysSinceLast > 3).length;
+        const outOfRange = allPatients.filter(p => p._summary.latestState === 'slow' || p._summary.latestState === 'fast').length;
+
+        document.getElementById('statTotalPatients').textContent = total;
+        document.getElementById('statActiveWeek').textContent = activeWeek;
+        document.getElementById('statNeedFollowUp').textContent = needFollowUp;
+        document.getElementById('statOutOfRange').textContent = outOfRange;
+    }
+
+    function renderPatientTiles() {
+        const q = (document.getElementById('patientSearch').value || '').toLowerCase().trim();
+        const grid = document.getElementById('patientGrid');
+        grid.innerHTML = '';
+
+        const filtered = allPatients.filter(p => {
+            const name = (p.name || '').toLowerCase();
+            const username = (p.username || '').toLowerCase();
+            return !q || name.includes(q) || username.includes(q);
+        });
+
+        if (!filtered.length) {
+            grid.innerHTML = '<div class="empty">No patients found.</div>';
+            return;
+        }
+
+        filtered.forEach(p => {
+            const tile = document.createElement('div');
+            tile.className = 'patient-tile' + (currentPatientId === p.id ? ' active' : '');
+            tile.onclick = () => selectPatient(p);
+
+            tile.innerHTML = `
+                <div class="patient-name">${escapeHtml(p.name || 'Unnamed patient')}</div>
+                <div class="patient-sub">@${escapeHtml(p.username || '')}</div>
+                <div class="tile-footer">
+                    <div class="patient-sub">${escapeHtml(p._summary.lastSessionLabel)}</div>
+                    ${renderBadgeHtmlFromState(p._summary.latestState, p._summary.latestFeedback)}
+                </div>
+            `;
+
+            grid.appendChild(tile);
+        });
+    }
+
+    function buildPatientSummary(patient, sessions) {
+        const now = new Date();
+        const last = sessions && sessions.length ? sessions[0] : null;
+        const lastDate = last ? new Date(last.timestamp) : null;
+        const daysSinceLast = lastDate ? Math.floor((now - lastDate) / (1000 * 60 * 60 * 24)) : null;
+
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+        const sessionsThisWeek = (sessions || []).filter(s => new Date(s.timestamp) >= oneWeekAgo).length;
+        const latestRate = last ? Number(last.syllablesPerSec || 0) : null;
+        const latestFeedback = last ? (last.feedback || '') : 'No result';
+        const latestState = classifyFeedback(latestFeedback);
+
+        let avgRate = null;
+        let inTargetCount = 0;
+        let comparedCount = 0;
+
+        if (sessions && sessions.length) {
+            avgRate = sessions.reduce((sum, s) => sum + Number(s.syllablesPerSec || 0), 0) / sessions.length;
+
+            if (patient.targetLow != null && patient.targetHigh != null) {
+                sessions.forEach(s => {
+                    const value = Number(s.syllablesPerSec || 0);
+                    comparedCount++;
+                    if (value >= patient.targetLow && value <= patient.targetHigh) {
+                        inTargetCount++;
+                    }
+                });
+            }
+        }
+
+        const inTargetPct = comparedCount ? Math.round((inTargetCount / comparedCount) * 100) : 0;
+
+        return {
+            latestRate,
+            latestFeedback,
+            latestState,
+            sessionsThisWeek,
+            avgRate,
+            inTargetPct,
+            daysSinceLast,
+            lastSessionLabel: lastDate ? lastDate.toLocaleString() : 'No sessions yet'
+        };
     }
 
     function selectPatient(p) {
         currentPatientId = p.id;
+        currentPatient = p;
+        renderPatientTiles();
 
-        document.getElementById('selectedPatientInfo').innerHTML =
-            '<div class="info-row"><span class="label">Name:</span><span>' + (p.name || '') + '</span></div>' +
-            '<div class="info-row"><span class="label">Username:</span><span>' + (p.username || '') + '</span></div>' +
-            '<div class="info-row"><span class="label">Language:</span><span>' + (p.language || '-') + '</span></div>' +
-            '<div class="info-row"><span class="label">Age group:</span><span>' + (p.ageGroup || '-') + '</span></div>' +
-            '<div class="info-row"><span class="label">Diagnosis:</span><span>' + (p.diagnosis || '-') + '</span></div>';
+        document.getElementById('selectedPatientShell').style.display = 'grid';
 
-        document.getElementById('editDetailsBox').style.display = 'block';
-        document.getElementById('newNoteBox').style.display = 'block';
-        document.getElementById('noteHistoryBox').style.display = 'block';
-        document.getElementById('targetsBox').style.display = 'block';
-        document.getElementById('sessionsTable').style.display = 'table';
+        document.getElementById('heroName').textContent = p.name || 'Unnamed patient';
+        document.getElementById('heroSub').textContent = 'Last session: ' + p._summary.lastSessionLabel;
+        document.getElementById('heroStatus').innerHTML = renderBadgeHtmlFromState(p._summary.latestState, p._summary.latestFeedback);
 
+        document.getElementById('metaUsername').textContent = p.username || '-';
+        document.getElementById('metaLanguage').textContent = p.language || '-';
+        document.getElementById('metaDiagnosis').textContent = p.diagnosis || '-';
+
+        renderSummaryCards(p._summary);
+        fillEditForm(p);
+        renderMessages(p._notes);
+        renderSessionsTable(p._sessions);
+        drawChart(p._sessions, p.targetLow, p.targetHigh, p.name || '');
+    }
+
+    function renderSummaryCards(summary) {
+        document.getElementById('summaryGrid').innerHTML = `
+            <div class="summary-card blue">
+                <div class="summary-kicker">Latest rate</div>
+                <div class="summary-big">${summary.latestRate != null ? summary.latestRate.toFixed(2) : '-'}</div>
+                <div class="summary-small">syllables / sec</div>
+            </div>
+            <div class="summary-card green">
+                <div class="summary-kicker">Sessions this week</div>
+                <div class="summary-big">${summary.sessionsThisWeek}</div>
+                <div class="summary-small">recent recordings</div>
+            </div>
+            <div class="summary-card orange">
+                <div class="summary-kicker">In target range</div>
+                <div class="summary-big">${summary.inTargetPct}%</div>
+                <div class="summary-small">saved sessions</div>
+            </div>
+            <div class="summary-card red">
+                <div class="summary-kicker">Days since last practice</div>
+                <div class="summary-big">${summary.daysSinceLast != null ? summary.daysSinceLast : '-'}</div>
+                <div class="summary-small">${escapeHtml(summary.latestFeedback || '')}</div>
+            </div>
+        `;
+    }
+
+    function fillEditForm(p) {
         document.getElementById('editName').value = p.name || '';
         document.getElementById('editLanguage').value = p.language || 'English';
-        document.getElementById('editAgeGroup').value = p.ageGroup || '61-75';
-        document.getElementById('editDiagnosis').value = p.diagnosis || 'Dysarthria';
-
-        document.getElementById('newNoteText').value = '';
-        document.getElementById('noteStatus').textContent = '';
-
         document.getElementById('targetLow').value = p.targetLow != null ? p.targetLow : '';
         document.getElementById('targetHigh').value = p.targetHigh != null ? p.targetHigh : '';
-        document.getElementById('targetsStatus').textContent = '';
+        document.getElementById('newNoteText').value = '';
         document.getElementById('detailsStatus').textContent = '';
+        document.getElementById('targetsStatus').textContent = '';
+        document.getElementById('noteStatus').textContent = '';
+
+        const known = [
+            'Dysarthria',
+            'Dysarthria – Stroke',
+            'Dysarthria – Parkinson’s disease',
+            'Dysarthria – Cerebral palsy',
+            'Dysarthria – Traumatic brain injury'
+        ];
+
+        if (known.includes(p.diagnosis)) {
+            document.getElementById('editDiagnosis').value = p.diagnosis;
+            document.getElementById('otherDiagnosisText').value = '';
+        } else {
+            document.getElementById('editDiagnosis').value = 'Other';
+            document.getElementById('otherDiagnosisText').value = p.diagnosis || '';
+        }
+
+        toggleOtherDiagnosis();
+    }
+
+    function toggleOtherDiagnosis() {
+        const isOther = document.getElementById('editDiagnosis').value === 'Other';
+        document.getElementById('otherDiagnosisWrap').style.display = isOther ? 'block' : 'none';
+    }
+
+    function renderMessages(notes) {
+        const list = document.getElementById('msgList');
+        const empty = document.getElementById('messagesEmpty');
+        list.innerHTML = '';
+
+        if (!notes || !notes.length) {
+            empty.style.display = 'block';
+            return;
+        }
+
+        empty.style.display = 'none';
+
+        notes.forEach(n => {
+            const item = document.createElement('div');
+            item.className = 'msg-item';
+            item.innerHTML = `
+                <div class="msg-content">${escapeHtml(n.content || '')}</div>
+                <div class="msg-foot">
+                    <span>${new Date(n.createdAt).toLocaleString()}</span>
+                    <button class="danger-btn" onclick="deleteNote(${n.id})">Delete</button>
+                </div>
+            `;
+            list.appendChild(item);
+        });
+    }
+
+    function renderSessionsTable(sessions) {
+        const tbody = document.querySelector('#sessionsTable tbody');
+        tbody.innerHTML = '';
+
+        if (!sessions || !sessions.length) {
+            tbody.innerHTML = '<tr><td colspan="3" class="empty">No sessions yet.</td></tr>';
+            return;
+        }
+
+        sessions.forEach(s => {
+            const state = classifyFeedback(s.feedback || '');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${new Date(s.timestamp).toLocaleString()}</td>
+                <td>${Number(s.syllablesPerSec || 0).toFixed(2)}</td>
+                <td>${renderBadgeHtmlFromState(state, s.feedback || '')}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function drawChart(sessions, targetLow, targetHigh, patientName) {
+        const canvas = document.getElementById('rateChart');
+        const ctx = canvas.getContext('2d');
+
+        if (chartInstance) {
+            chartInstance.destroy();
+            chartInstance = null;
+        }
+
+        const ordered = [...(sessions || [])].reverse();
+        const labels = ordered.map(s => {
+            const d = new Date(s.timestamp);
+            return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        });
+        const data = ordered.map(s => Number(s.syllablesPerSec || 0));
 
         document.getElementById('chartSubtitle').textContent =
-            'Speech rate for ' + (p.name || '') + ' (recent sessions).';
+            'Trend for ' + patientName + '. Green area shows the target range.';
 
-        loadSessionsForPatient(p.id);
-        loadNotesForPatient(p.id);
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Speech rate',
+                    data,
+                    borderColor: '#5e84cb',
+                    backgroundColor: 'rgba(94,132,203,.12)',
+                    pointBackgroundColor: '#5e84cb',
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    borderWidth: 2,
+                    tension: 0.28,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                resizeDelay: 100,
+                plugins: {
+                    legend: { display: false },
+                    targetZonePlugin: {
+                        low: targetLow,
+                        high: targetHigh
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 8
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        suggestedMax: Math.max((targetHigh || 4) + 1, 5),
+                        ticks: {
+                            callback: value => value + ' s/s'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function classifyFeedback(feedback) {
+        const fb = (feedback || '').toLowerCase();
+        if (fb.includes('slow')) return 'slow';
+        if (fb.includes('fast')) return 'fast';
+        if (fb.includes('good')) return 'good';
+        return 'none';
+    }
+
+    function renderBadgeHtmlFromState(state, text) {
+        const safe = escapeHtml(text || 'No result');
+        if (state === 'good') return `<span class="badge good">${safe}</span>`;
+        if (state === 'slow') return `<span class="badge slow">${safe}</span>`;
+        if (state === 'fast') return `<span class="badge fast">${safe}</span>`;
+        return `<span class="badge neutral">${safe}</span>`;
+    }
+
+    function useTemplate(text) {
+        document.getElementById('newNoteText').value = text;
+        document.getElementById('newNoteText').focus();
     }
 
     async function savePatientDetails() {
-        if (!currentPatientId) return;
+        if (!currentPatientId || !currentPatient) return;
+
+        const selectedDiagnosis = document.getElementById('editDiagnosis').value;
+        const otherDiagnosis = document.getElementById('otherDiagnosisText').value.trim();
+        const finalDiagnosis = selectedDiagnosis === 'Other' ? otherDiagnosis : selectedDiagnosis;
+        const statusEl = document.getElementById('detailsStatus');
+
+        if (selectedDiagnosis === 'Other' && !otherDiagnosis) {
+            statusEl.style.color = '#B91C1C';
+            statusEl.textContent = 'Please enter the other diagnosis.';
+            return;
+        }
 
         const params = new URLSearchParams();
-        params.append("name", document.getElementById('editName').value.trim());
-        params.append("language", document.getElementById('editLanguage').value);
-        params.append("ageGroup", document.getElementById('editAgeGroup').value);
-        params.append("diagnosis", document.getElementById('editDiagnosis').value);
+        params.append('name', document.getElementById('editName').value.trim());
+        params.append('language', document.getElementById('editLanguage').value);
+        params.append('diagnosis', finalDiagnosis);
+        params.append('ageGroup', currentPatient.ageGroup || '');
 
-        const statusEl = document.getElementById('detailsStatus');
-        statusEl.style.color = "#6B7280";
-        statusEl.textContent = "Saving...";
+        statusEl.style.color = '#64748B';
+        statusEl.textContent = 'Saving...';
 
         try {
             const res = await fetch('/api/patients/' + currentPatientId + '/details', {
@@ -275,154 +1169,17 @@
             });
 
             if (!res.ok) {
-                statusEl.style.color = "#B91C1C";
-                statusEl.textContent = "Failed";
+                statusEl.style.color = '#B91C1C';
+                statusEl.textContent = 'Failed';
                 return;
             }
 
-            statusEl.style.color = "#16A34A";
-            statusEl.textContent = "Saved";
-            loadPatients();
+            statusEl.style.color = '#15803D';
+            statusEl.textContent = 'Saved';
+            await reloadSelectedPatient();
         } catch (e) {
-            statusEl.style.color = "#B91C1C";
-            statusEl.textContent = "Error";
-        }
-    }
-
-    async function loadSessionsForPatient(patientId) {
-        try {
-            const res = await fetch('/api/patients/' + patientId + '/sessions');
-            if (!res.ok) return;
-            const sessions = await res.json();
-            const tbody = document.querySelector('#sessionsTable tbody');
-            tbody.innerHTML = '';
-
-            const labels = [];
-            const data = [];
-
-            sessions.forEach(s => {
-                const tr = document.createElement('tr');
-                const d = new Date(s.timestamp);
-                const dateStr = d.toLocaleString();
-
-                const fb = (s.feedback || '').toLowerCase();
-                let badgeClass = '';
-                if (fb === 'good pace') badgeClass = 'good';
-                else if (fb.includes('fast')) badgeClass = 'fast';
-                else if (fb.includes('slow')) badgeClass = 'slow';
-
-                tr.innerHTML =
-                    '<td>' + dateStr + '</td>' +
-                    '<td>' + s.syllablesPerSec.toFixed(2) + '</td>' +
-                    '<td><span class="badge ' + badgeClass + '">' + s.feedback + '</span></td>';
-
-                tbody.appendChild(tr);
-
-                labels.unshift(dateStr);
-                data.unshift(s.syllablesPerSec);
-            });
-
-            drawChart(labels, data);
-        } catch (e) {
-            console.error("Error loading sessions", e);
-        }
-    }
-
-    async function loadNotesForPatient(patientId) {
-        try {
-            const res = await fetch('/api/patients/' + patientId + '/notes');
-            if (!res.ok) return;
-            const notes = await res.json();
-            const tbody = document.querySelector('#notesTable tbody');
-            tbody.innerHTML = '';
-
-            notes.forEach(n => {
-                const tr = document.createElement('tr');
-                const d = new Date(n.createdAt);
-                const dateStr = d.toLocaleString();
-                tr.innerHTML =
-                    '<td>' + dateStr + '</td>' +
-                    '<td>' + (n.content || '') + '</td>' +
-                    '<td><button class="danger-btn" onclick="deleteNote(' + n.id + ')">Delete</button></td>';
-                tbody.appendChild(tr);
-            });
-        } catch (e) {
-            console.error("Error loading notes", e);
-        }
-    }
-
-    async function deleteNote(noteId) {
-        if (!confirm("Delete this message?")) return;
-
-        try {
-            const res = await fetch('/api/notes/' + noteId, {
-                method: 'DELETE'
-            });
-            if (!res.ok) return;
-            loadNotesForPatient(currentPatientId);
-        } catch (e) {
-            console.error("Error deleting note", e);
-        }
-    }
-
-    function drawChart(labels, data) {
-        const ctx = document.getElementById('rateChart').getContext('2d');
-        if (window._chart) window._chart.destroy();
-        window._chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Speech rate (syll/sec)',
-                    data: data,
-                    borderWidth: 2,
-                    tension: 0.3
-                }]
-            },
-            options: {
-                scales: { y: { beginAtZero: true } }
-            }
-        });
-    }
-
-    async function sendNote() {
-        if (!currentPatientId) return;
-
-        const text = document.getElementById('newNoteText').value.trim();
-        const statusEl = document.getElementById('noteStatus');
-
-        if (!text) {
-            statusEl.style.color = "#B91C1C";
-            statusEl.textContent = "Please write a message.";
-            return;
-        }
-
-        statusEl.style.color = "#6B7280";
-        statusEl.textContent = "Sending...";
-
-        const params = new URLSearchParams();
-        params.append("content", text);
-        params.append("therapistId", therapistId);
-
-        try {
-            const res = await fetch('/api/patients/' + currentPatientId + '/notes', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: params.toString()
-            });
-            if (!res.ok) {
-                statusEl.style.color = "#B91C1C";
-                statusEl.textContent = "Failed";
-                return;
-            }
-
-            document.getElementById('newNoteText').value = "";
-            statusEl.style.color = "#16A34A";
-            statusEl.textContent = "Sent";
-            loadNotesForPatient(currentPatientId);
-        } catch (e) {
-            statusEl.style.color = "#B91C1C";
-            statusEl.textContent = "Error";
+            statusEl.style.color = '#B91C1C';
+            statusEl.textContent = 'Error';
         }
     }
 
@@ -434,22 +1191,23 @@
         const statusEl = document.getElementById('targetsStatus');
 
         if (isNaN(low) || isNaN(high)) {
-            statusEl.style.color = "#B91C1C";
-            statusEl.textContent = "Enter both numbers";
-            return;
-        }
-        if (low >= high) {
-            statusEl.style.color = "#B91C1C";
-            statusEl.textContent = "Low must be < high";
+            statusEl.style.color = '#B91C1C';
+            statusEl.textContent = 'Enter both numbers';
             return;
         }
 
-        statusEl.style.color = "#6B7280";
-        statusEl.textContent = "Saving...";
+        if (low >= high) {
+            statusEl.style.color = '#B91C1C';
+            statusEl.textContent = 'Low must be less than high';
+            return;
+        }
+
+        statusEl.style.color = '#64748B';
+        statusEl.textContent = 'Saving...';
 
         const params = new URLSearchParams();
-        params.append("targetLow", low);
-        params.append("targetHigh", high);
+        params.append('targetLow', low);
+        params.append('targetHigh', high);
 
         try {
             const res = await fetch('/api/patients/' + currentPatientId + '/targets', {
@@ -457,19 +1215,106 @@
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: params.toString()
             });
+
             if (!res.ok) {
-                statusEl.style.color = "#B91C1C";
-                statusEl.textContent = "Failed";
+                statusEl.style.color = '#B91C1C';
+                statusEl.textContent = 'Failed';
                 return;
             }
 
-            statusEl.style.color = "#16A34A";
-            statusEl.textContent = "Saved";
-            loadPatients();
+            statusEl.style.color = '#15803D';
+            statusEl.textContent = 'Saved';
+            await reloadSelectedPatient();
         } catch (e) {
-            statusEl.style.color = "#B91C1C";
-            statusEl.textContent = "Error";
+            statusEl.style.color = '#B91C1C';
+            statusEl.textContent = 'Error';
         }
+    }
+
+    async function sendNote() {
+        if (!currentPatientId) return;
+
+        const text = document.getElementById('newNoteText').value.trim();
+        const statusEl = document.getElementById('noteStatus');
+
+        if (!text) {
+            statusEl.style.color = '#B91C1C';
+            statusEl.textContent = 'Please write a message.';
+            return;
+        }
+
+        statusEl.style.color = '#64748B';
+        statusEl.textContent = 'Sending...';
+
+        const params = new URLSearchParams();
+        params.append('content', text);
+        params.append('therapistId', therapistId);
+
+        try {
+            const res = await fetch('/api/patients/' + currentPatientId + '/notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+
+            if (!res.ok) {
+                statusEl.style.color = '#B91C1C';
+                statusEl.textContent = 'Failed';
+                return;
+            }
+
+            document.getElementById('newNoteText').value = '';
+            statusEl.style.color = '#15803D';
+            statusEl.textContent = 'Sent';
+            await reloadSelectedPatient();
+        } catch (e) {
+            statusEl.style.color = '#B91C1C';
+            statusEl.textContent = 'Error';
+        }
+    }
+
+    async function deleteNote(noteId) {
+        if (!confirm('Delete this message?')) return;
+
+        try {
+            const res = await fetch('/api/notes/' + noteId, {
+                method: 'DELETE'
+            });
+            if (!res.ok) return;
+            await reloadSelectedPatient();
+        } catch (e) {
+            console.error('Error deleting note', e);
+        }
+    }
+
+    async function reloadSelectedPatient() {
+        const res = await fetch('/api/therapist/patients');
+        if (!res.ok) return;
+
+        allPatients = await res.json();
+
+        await Promise.all(allPatients.map(async p => {
+            p._sessions = await fetchPatientSessions(p.id);
+            p._notes = await fetchPatientNotes(p.id);
+            p._summary = buildPatientSummary(p, p._sessions);
+        }));
+
+        renderTopStats();
+        renderPatientTiles();
+
+        const updated = allPatients.find(p => p.id === currentPatientId);
+        if (updated) {
+            selectPatient(updated);
+        }
+    }
+
+    function escapeHtml(str) {
+        return String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 
     function logout() {

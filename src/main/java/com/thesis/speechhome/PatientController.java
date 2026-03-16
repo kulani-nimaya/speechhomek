@@ -2,6 +2,7 @@ package com.thesis.speechhome;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -41,8 +42,10 @@ public class PatientController {
                                  @RequestParam Double targetHigh) {
         Patient p = patientRepo.findById(patientId)
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
+
         p.setTargetLow(targetLow);
         p.setTargetHigh(targetHigh);
+
         return patientRepo.save(p);
     }
 
@@ -50,14 +53,29 @@ public class PatientController {
     public Patient updatePatientDetails(@PathVariable Long patientId,
                                         @RequestParam String name,
                                         @RequestParam String language,
-                                        @RequestParam String ageGroup,
-                                        @RequestParam String diagnosis) {
+                                        @RequestParam(required = false) String dateOfBirth,
+                                        @RequestParam String diagnosis,
+                                        @RequestParam(required = false) String diagnosisOther) {
         Patient p = patientRepo.findById(patientId)
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
+
         p.setName(name);
         p.setLanguage(language);
-        p.setAgeGroup(ageGroup);
+
+        if (dateOfBirth != null && !dateOfBirth.isBlank()) {
+            p.setDateOfBirth(LocalDate.parse(dateOfBirth));
+        } else {
+            p.setDateOfBirth(null);
+        }
+
         p.setDiagnosis(diagnosis);
+
+        if ("Other".equalsIgnoreCase(diagnosis)) {
+            p.setDiagnosisOther(diagnosisOther != null ? diagnosisOther.trim() : "");
+        } else {
+            p.setDiagnosisOther(null);
+        }
+
         return patientRepo.save(p);
     }
 }
