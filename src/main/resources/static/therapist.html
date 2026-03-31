@@ -698,6 +698,7 @@
 
                 <div class="save-row">
                     <button class="primary-btn" onclick="sendNote()">Send message</button>
+                    <button class="primary-btn" style="background:#f59e0b" onclick="sendReminder()">Send reminder</button>
                     <span id="noteStatus" class="status-text"></span>
                 </div>
             </div>
@@ -819,11 +820,11 @@
 
     async function fetchPatientNotes(patientId) {
         try {
-            const res = await fetch('/api/patients/' + patientId + '/notes');
+            const res = await fetch('/api/patients/' + patientId + '/messages');
             if (!res.ok) return [];
             return await res.json();
         } catch (e) {
-            console.error('Error loading notes', e);
+            console.error('Error loading messages', e);
             return [];
         }
     }
@@ -1014,15 +1015,28 @@
         empty.style.display = 'none';
 
         notes.forEach(n => {
+            const isPatient = n.sender === 'PATIENT';
+            const isReminder = n.type === 'REMINDER';
+
             const item = document.createElement('div');
-            item.className = 'msg-item';
+            item.style.display = 'flex';
+            item.style.justifyContent = isPatient ? 'flex-end' : 'flex-start';
+
             item.innerHTML = `
-                <div class="msg-content">${escapeHtml(n.content || '')}</div>
-                <div class="msg-foot">
-                    <span>${new Date(n.createdAt).toLocaleString()}</span>
-                    <button class="danger-btn" onclick="deleteNote(${n.id})">Delete</button>
+            <div style="
+                max-width:70%;
+                padding:10px;
+                border-radius:16px;
+                background:${isReminder ? '#fff3c4' : (isPatient ? '#dbeafe' : '#f1f5f9')};
+            ">
+                <div>${escapeHtml(n.content || '')}</div>
+                <div style="font-size:11px;color:#666;margin-top:6px;">
+                    ${new Date(n.createdAt).toLocaleString()}
                 </div>
-            `;
+                ${!isPatient ? `<button class="danger-btn" onclick="deleteNote(${n.id})">Delete</button>` : ''}
+            </div>
+        `;
+
             list.appendChild(item);
         });
     }
@@ -1239,26 +1253,18 @@
 
         if (!text) {
             statusEl.style.color = '#B91C1C';
-            statusEl.textContent = 'Please write a message.';
+            statusEl.textContent = 'Write a message';
             return;
         }
 
-        statusEl.style.color = '#64748B';
         statusEl.textContent = 'Sending...';
 
-        const params = new URLSearchParams();
-        params.append('content', text);
-        params.append('therapistId', therapistId);
-
         try {
-            const res = await fetch('/api/patients/' + currentPatientId + '/notes', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: params.toString()
+            const res = await fetch('/api/patients/' + currentPatientId + '/messages/therapist?content=' + encodeURIComponent(text), {
+                method: 'POST'
             });
 
             if (!res.ok) {
-                statusEl.style.color = '#B91C1C';
                 statusEl.textContent = 'Failed';
                 return;
             }
@@ -1266,12 +1272,27 @@
             document.getElementById('newNoteText').value = '';
             statusEl.style.color = '#15803D';
             statusEl.textContent = 'Sent';
+
             await reloadSelectedPatient();
         } catch (e) {
-            statusEl.style.color = '#B91C1C';
             statusEl.textContent = 'Error';
         }
     }
+
+    async function sendReminder() {
+        if (!currentPatientId) return;
+
+        try {
+            await fetch('/api/patients/' + currentPatientId + '/messages/reminder?content=Please start your practice session today', {
+                method: 'POST'
+            });
+
+            await reloadSelectedPatient();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
 
     async function deleteNote(noteId) {
         if (!confirm('Delete this message?')) return;

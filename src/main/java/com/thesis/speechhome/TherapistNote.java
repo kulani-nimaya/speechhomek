@@ -11,10 +11,17 @@ public class TherapistNote {
     private Long id;
 
     private Long patientId;
-    private Long therapistId;   // optional, for future use
+
+    private Long therapistId;
 
     @Column(length = 2000)
     private String content;
+
+    // NEW: who sent the message
+    private String sender; // "PATIENT" or "THERAPIST"
+
+    // NEW: message type
+    private String type; // "TEXT", "QUICK", "REMINDER"
 
     private LocalDateTime createdAt;
 
@@ -22,6 +29,9 @@ public class TherapistNote {
     public void prePersist() {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
+        }
+        if (type == null) {
+            type = "TEXT";
         }
     }
 
@@ -53,6 +63,22 @@ public class TherapistNote {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public LocalDateTime getCreatedAt() {
