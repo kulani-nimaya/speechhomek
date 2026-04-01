@@ -2,142 +2,133 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Messages</title>
+  <title>Therapist Messages</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <style>
     :root{
       --bg:#eef3fb;
-      --primary:#6f98dd;
-      --secondary:#8ec8ad;
-      --white:#fff;
+      --card:#ffffff;
       --text:#1f2937;
       --muted:#6b7280;
+      --primary:#6f98dd;
+      --primary2:#8ec8ad;
+      --soft:#f6fbff;
+      --soft-border:#dbeafb;
+      --shadow:0 10px 28px rgba(15,23,42,.08);
     }
+
+    *{ box-sizing:border-box; }
 
     body{
       margin:0;
-      font-family:Inter,Arial;
-      background:var(--bg);
-      display:flex;
-      flex-direction:column;
-      height:100vh;
+      font-family:Inter,"Segoe UI",Arial,sans-serif;
+      color:var(--text);
+      background:linear-gradient(180deg,#f8fbff 0%,#eef3fb 100%);
     }
 
-    /* HEADER */
     header{
-      background:linear-gradient(135deg,var(--primary),var(--secondary));
-      color:white;
-      padding:16px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
+      background:linear-gradient(135deg,var(--primary),var(--primary2));
+      color:#fff;
+      padding:18px 18px 22px;
+      border-bottom-left-radius:26px;
+      border-bottom-right-radius:26px;
+      box-shadow:0 10px 24px rgba(95,143,220,.2);
     }
 
-    button{
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .back-btn{
       border:none;
       border-radius:999px;
-      padding:8px 12px;
+      padding:10px 14px;
+      background:rgba(255,255,255,.18);
+      color:#fff;
+      font-weight:700;
       cursor:pointer;
     }
 
-    /* CHAT AREA */
-    .chat{
-      flex:1;
-      overflow-y:auto;
-      padding:16px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
+    .title{
+      font-size:22px;
+      font-weight:800;
     }
 
-    /* MESSAGE */
-    .msg{
-      max-width:70%;
-      padding:10px 14px;
-      border-radius:16px;
-      font-size:14px;
-      line-height:1.5;
-    }
-
-    /* therapist (left) */
-    .msg.left{
-      background:white;
-      align-self:flex-start;
-    }
-
-    /* patient (right) */
-    .msg.right{
-      background:#dbeafe;
-      align-self:flex-end;
-    }
-
-    /* reminder */
-    .msg.reminder{
-      background:#fef3c7;
-      border:1px solid #facc15;
-    }
-
-    /* time */
-    .time{
-      font-size:11px;
-      color:var(--muted);
+    .subtitle{
       margin-top:4px;
+      font-size:14px;
+      opacity:.95;
     }
 
-    /* INPUT AREA */
-    .input-area{
-      display:flex;
-      gap:8px;
-      padding:10px;
-      background:white;
+    .wrap{
+      max-width:760px;
+      margin:0 auto;
+      padding:18px;
     }
 
-    .input-area input{
-      flex:1;
-      padding:10px;
-      border-radius:999px;
-      border:1px solid #ccc;
+    .message-list{
+      display:grid;
+      gap:14px;
     }
 
-    .send-btn{
-      background:var(--primary);
-      color:white;
+    .msg-card{
+      background:var(--card);
+      border-radius:20px;
+      padding:16px;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(219,227,238,.9);
     }
 
-    /* QUICK REPLIES */
-    .quick{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      padding:10px;
+    .msg-bubble{
+      background:var(--soft);
+      border:1px solid var(--soft-border);
+      border-radius:16px;
+      padding:14px;
     }
 
-    .quick button{
-      background:#e0f2fe;
+    .msg-text{
+      font-size:15px;
+      line-height:1.65;
+      color:#243447;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .msg-time{
+      margin-top:10px;
       font-size:12px;
+      color:var(--muted);
+      text-align:right;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      font-size:14px;
+      background:var(--card);
+      border-radius:20px;
+      padding:22px;
+      box-shadow:var(--shadow);
     }
   </style>
 </head>
-
 <body>
-
 <header>
-  <div>Messages</div>
-  <button onclick="goBack()">Back</button>
+  <div class="top">
+    <div>
+      <div class="title">Therapist messages</div>
+      <div class="subtitle">Your guidance and reminders</div>
+    </div>
+    <button class="back-btn" onclick="goBack()">Back</button>
+  </div>
 </header>
 
-<div id="chat" class="chat"></div>
-
-<div class="quick">
-  <button onclick="quickReply('I completed all tasks')">Completed</button>
-  <button onclick="quickReply('I need more time')">Need time</button>
-  <button onclick="quickReply('Can I book appointment?')">Appointment</button>
-</div>
-
-<div class="input-area">
-  <input id="msgInput" placeholder="Type message..." />
-  <button class="send-btn" onclick="sendMessage()">Send</button>
+<div class="wrap">
+  <div id="messageList" class="message-list"></div>
+  <div id="emptyState" class="empty" style="display:none;">No messages yet.</div>
 </div>
 
 <script>
@@ -148,72 +139,58 @@
   }
 
   async function loadMessages() {
-    const res = await fetch('/api/patients/' + patientId + '/messages');
-    const data = await res.json();
+    try {
+      const res = await fetch('/api/patients/' + patientId + '/messages');
+      if (!res.ok) return;
 
-    const chat = document.getElementById('chat');
-    chat.innerHTML = '';
+      const notes = await res.json();
+      const list = document.getElementById('messageList');
+      const empty = document.getElementById('emptyState');
 
-    data.forEach(m => {
-      const div = document.createElement('div');
+      list.innerHTML = '';
 
-      let cls = 'msg ';
-      cls += (m.sender === 'PATIENT') ? 'right' : 'left';
+      if (!notes || notes.length === 0) {
+        empty.style.display = 'block';
+        return;
+      }
 
-      if (m.type === 'REMINDER') cls += ' reminder';
+      empty.style.display = 'none';
 
-      div.className = cls;
+      notes.forEach(n => {
+        const card = document.createElement('div');
+        card.className = 'msg-card';
 
-      const time = new Date(m.createdAt).toLocaleString();
+        const d = new Date(n.createdAt);
+        const dateStr = d.toLocaleString();
 
-      div.innerHTML = `
-      ${escapeHtml(m.content)}
-      <div class="time">${time}</div>
-    `;
+        card.innerHTML = `
+                    <div class="msg-bubble">
+                        <div class="msg-text">${escapeHtml(n.content || '')}</div>
+                        <div class="msg-time">${dateStr}</div>
+                    </div>
+                `;
 
-      chat.appendChild(div);
-    });
-
-    chat.scrollTop = chat.scrollHeight;
+        list.appendChild(card);
+      });
+    } catch (e) {
+      console.error('Error loading messages', e);
+    }
   }
 
-  async function sendMessage() {
-    const input = document.getElementById('msgInput');
-    const text = input.value.trim();
-    if (!text) return;
-
-    await fetch('/api/patients/' + patientId + '/messages/patient?content=' + encodeURIComponent(text), {
-      method: 'POST'
-    });
-
-    input.value = '';
-    loadMessages();
-  }
-
-  async function quickReply(text) {
-    await fetch('/api/patients/' + patientId + '/messages/quick?content=' + encodeURIComponent(text), {
-      method: 'POST'
-    });
-
-    loadMessages();
-  }
-
-  function goBack(){
+  function goBack() {
     window.location.href = '/patient.html';
   }
 
-  function escapeHtml(str){
+  function escapeHtml(str) {
     return str
-            .replace(/&/g,'&amp;')
-            .replace(/</g,'&lt;')
-            .replace(/>/g,'&gt;');
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
   }
-
-  /* AUTO REFRESH */
-  setInterval(loadMessages, 3000);
 
   loadMessages();
 </script>
-
 </body>
 </html>
