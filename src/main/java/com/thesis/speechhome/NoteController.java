@@ -6,7 +6,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin
 public class NoteController {
 
     private final TherapistNoteRepository noteRepo;
@@ -15,25 +14,20 @@ public class NoteController {
         this.noteRepo = noteRepo;
     }
 
-    // ===============================
-    // 🔹 GET FULL CHAT (ordered)
-    // ===============================
+    // ✅ GET ALL MESSAGES
     @GetMapping("/patients/{patientId}/messages")
     public List<TherapistNote> getMessages(@PathVariable Long patientId) {
         return noteRepo.findByPatientIdOrderByCreatedAtAsc(patientId);
     }
 
-    // ===============================
-    // 🔹 SEND MESSAGE (Therapist)
-    // ===============================
+    // ✅ THERAPIST SEND MESSAGE
     @PostMapping("/patients/{patientId}/messages/therapist")
-    public TherapistNote sendFromTherapist(@PathVariable Long patientId,
-                                           @RequestParam String content,
-                                           @RequestParam(required = false) Long therapistId) {
+    public TherapistNote sendTherapistMessage(
+            @PathVariable Long patientId,
+            @RequestParam String content) {
 
         TherapistNote note = new TherapistNote();
         note.setPatientId(patientId);
-        note.setTherapistId(therapistId);
         note.setContent(content);
         note.setSender("THERAPIST");
         note.setType("TEXT");
@@ -41,12 +35,11 @@ public class NoteController {
         return noteRepo.save(note);
     }
 
-    // ===============================
-    // 🔹 SEND MESSAGE (Patient)
-    // ===============================
+    // ✅ PATIENT SEND MESSAGE
     @PostMapping("/patients/{patientId}/messages/patient")
-    public TherapistNote sendFromPatient(@PathVariable Long patientId,
-                                         @RequestParam String content) {
+    public TherapistNote sendPatientMessage(
+            @PathVariable Long patientId,
+            @RequestParam String content) {
 
         TherapistNote note = new TherapistNote();
         note.setPatientId(patientId);
@@ -57,12 +50,11 @@ public class NoteController {
         return noteRepo.save(note);
     }
 
-    // ===============================
-    // 🔹 QUICK REPLY (Patient)
-    // ===============================
+    // ✅ QUICK REPLY
     @PostMapping("/patients/{patientId}/messages/quick")
-    public TherapistNote quickReply(@PathVariable Long patientId,
-                                    @RequestParam String content) {
+    public TherapistNote quickReply(
+            @PathVariable Long patientId,
+            @RequestParam String content) {
 
         TherapistNote note = new TherapistNote();
         note.setPatientId(patientId);
@@ -73,17 +65,14 @@ public class NoteController {
         return noteRepo.save(note);
     }
 
-    // ===============================
-    // 🔹 SEND REMINDER (Therapist)
-    // ===============================
-    @PostMapping("/patients/{patientId}/reminder")
-    public TherapistNote sendReminder(@PathVariable Long patientId,
-                                      @RequestParam String content,
-                                      @RequestParam(required = false) Long therapistId) {
+    // ✅ REMINDER
+    @PostMapping("/patients/{patientId}/messages/reminder")
+    public TherapistNote sendReminder(
+            @PathVariable Long patientId,
+            @RequestParam String content) {
 
         TherapistNote note = new TherapistNote();
         note.setPatientId(patientId);
-        note.setTherapistId(therapistId);
         note.setContent(content);
         note.setSender("THERAPIST");
         note.setType("REMINDER");
@@ -91,19 +80,9 @@ public class NoteController {
         return noteRepo.save(note);
     }
 
-    // ===============================
-    // 🔹 DELETE MESSAGE
-    // ===============================
-    @DeleteMapping("/messages/{id}")
-    public void deleteMessage(@PathVariable Long id) {
-        noteRepo.deleteById(id);
-    }
-
-    // ===============================
-    // 🔹 MESSAGE COUNT (for badge)
-    // ===============================
-    @GetMapping("/patients/{patientId}/messages/count")
-    public long getMessageCount(@PathVariable Long patientId) {
-        return noteRepo.countByPatientId(patientId);
+    // ✅ DELETE
+    @DeleteMapping("/notes/{noteId}")
+    public void delete(@PathVariable Long noteId) {
+        noteRepo.deleteById(noteId);
     }
 }
